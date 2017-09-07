@@ -1,20 +1,21 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Edit video effects</title>
-	<LINK href='main.css' type=text/css rel=stylesheet>
-	<script src="jscolor.js"></script>	
-</head>
-<body>
-<a href="index.php"> [ Home ] </a>
-<hr>
-
 <?php
 
 include_once("image2video.php");
+$head="<!doctype html>
+<html lang='en'>
+<head>
+    <meta charset='UTF-8'>
+    <title>Edit video effects</title>
+	<LINK href='main.css' type=text/css rel=stylesheet>
+	<script src='jscolor.js'></script>	
+</head>
+<body>
+<a href='index.php'> [ Home ] </a>
+<hr>
 
+	";
 if( !$_POST['project_id'] && !$_GET['project_id']  ) {
+	echo $head;
 	echo "<h3> Error !Cannot found project name </h3>";
 	echo "Try again <a href=index.php> here </a>
 		</body>
@@ -26,11 +27,14 @@ if( !$_POST['project_id'] && !$_GET['project_id']  ) {
 $project_id=$_POST['project_id'];
 if( !$project_id ) $project_id=$_GET['project_id'];
 $basedir=dirname(__FILE__);
+$main_upload_dir="$basedir/uploads/";
 $upload_dir="$basedir/uploads/$project_id";
 $upload_url="./uploads/$project_id";
 $bin_dir="$basedir/bin";
 
 if( !file_exists( "$upload_dir/project.txt") ) {		
+	echo $head;
+
 	echo "<h3> Error ! Cannot found project name </h3>";
 	echo "Try again <a href=index.php> here </a>
 		</body>
@@ -62,10 +66,14 @@ $project = json_decode($string, true);
 $string = file_get_contents("$upload_dir/logo.txt");
 $logo = json_decode($string, true);
 
-$fonts_array = file('./fonts.txt');
+$string = file_get_contents("$upload_dir/crest.txt");
+$crest = json_decode($string, true);
+
+
+$fonts_array = file("$main_upload_dir/fonts.txt");
 if( ! $fonts_array ) {
 	$fonts_array=array();
-	$fonts_array[]='/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf';
+	$fonts_array[]=image2video::$font;
 }
 
 	if( $_POST['make_video'] ) 
@@ -76,12 +84,12 @@ if( ! $fonts_array ) {
 		header("Location: $upload_url/make_slideshow_report.html"); 
 		exit;		
 	}
+	echo $head;
 
 if(!empty($images))
 {
 	echo '<h3> Project: '.$project['project_name'].'</h3>';	
-	echo "// <a href='add_logo.php?project_id=$project_id'>Logo</a> // <a href='upload_audio.php?project_id=$project_id'>Audio</a> // <a href='add_new_image.php?project_id=$project_id'>Add new image</a> // <a href='change_image_order.php?project_id=$project_id'>Change image order</a> // <a href='delete_image.php?project_id=$project_id'>Remove the image</a> // <a href='edit_effect.php?project_id=$project_id'>Edit effect</a> //<hr><br>";	
-
+	echo image2video::showMenu( $project_id );
 
 	if( file_exists( "$upload_dir/outfile.mp4") ) {		
 		echo "<hr><a href='$upload_url/outfile.mp4'> This project have early generated video file </a> <hr> ";
@@ -106,6 +114,8 @@ foreach($images as $k=>$val):
 		$audio_fade_in=$_POST['audio_fade_in'][$k];
 		$fade_out=$_POST['fade_out'][$k];
 		$audio_fade_out=$_POST['audio_fade_out'][$k];
+
+		$disable_crest_for_last_image=$_POST['disable_crest_for_last_image'][$k];
 		
 		$duration= $_POST['duration'][$k];
 		if (empty($_POST['duration'][$k]) || !is_numeric( $duration) ) {
@@ -134,7 +144,7 @@ foreach($images as $k=>$val):
 		
 		$font_size= $_POST['font_size'][$k];
 		if( ! is_numeric( $font_size ) || $font_size <12 || $font_size > 150   ) {
-			$font_size=36	;		
+			$font_size=image2video::$font_size	;		
 		}	
 		
 		$text_color= $_POST['text_color'][$k];
@@ -151,13 +161,22 @@ foreach($images as $k=>$val):
 		
 		$text_boxopacity= $_POST['text_boxopacity'][$k];
 		if( ! is_numeric( $text_boxopacity ) || $text_boxopacity <0 || $text_boxopacity > 100  ) {
-			$font_size=50	;		
+			$font_size=image2video::$font_size	;		
 		}
 		$transition= $_POST['transition'][$k];	
 		$transition_expensions= array( 'fade','crossfade','overlay','none','concat' );
 		if( in_array($transition,$transition_expensions)=== false) {
 			$transition='none';
-		}		
+		}
+		$text_wrap= $_POST['text_wrap'][$k];		
+		if( ! is_numeric( $text_wrap ) || $text_wrap <0 || $text_wrap > 150   ) {
+			$text_x=0	;		
+		}
+		$crop_image= $_POST['crop_image'][$k];		
+		if( $crop_image  ) {
+			$crop_image=1	;		
+		}
+		
 		
 	} 
 	else {
@@ -177,6 +196,9 @@ foreach($images as $k=>$val):
 			$text_boxborder_color= $effects[$k]['text_boxborder_color'];
 			$text_boxopacity= $effects[$k]['text_boxopacity'];
 			$transition= $effects[$k]['transition'] ;
+			$text_wrap= $effects[$k]['text_wrap'];
+			$crop_image= $effects[$k]['crop_image'];
+			$disable_crest_for_last_image= $effects[$k]['disable_crest_for_last_image'];
 		}
 		else { 
 			# set default values
@@ -184,17 +206,25 @@ foreach($images as $k=>$val):
 			$audio_fade_in=  1 ; # only for first image
 			$fade_out=  1 ; # only for last image
 			$audio_fade_out=  1 ; # only for last image
-			$duration=  20 ;
+			$duration=  10 ;
 			$animation=  'none' ;
 			$text= '';
 			$text_x=  0;
 			$text_y=  0;
-			$font= $fonts_array[0];
-			$font_size= 36 ;
+			if( file_exists( image2video::$font ) ) {
+				$font= image2video::$font;
+			} else {
+				$font= $fonts_array[0];
+			}
+			$font_size= image2video::$font_size ;
 			$text_color= 'FFFFFF';
 			$text_boxborder_color= 'CCCCCC';
-			$text_boxopacity= 50;
+			$text_boxopacity= 0;
 			$transition= 'none' ;			
+			$text_wrap=  0;
+			$crop_image= 1 ;
+			$disable_crest_for_last_image= 1;
+			
 		}
 	}
 		$effects_info[$k]=array(
@@ -213,6 +243,10 @@ foreach($images as $k=>$val):
 			'text_boxborder_color'=>	$text_boxborder_color,
 			'text_boxopacity'=>	$text_boxopacity,
 			'transition'=>	$transition,
+			'crop_image'=>	$crop_image,
+			'text_wrap'=>	$text_wrap,
+			'disable_crest_for_last_image' => $disable_crest_for_last_image			
+			
 		);	
 	if( ! $first_record ) {
 		echo "</td>
@@ -239,13 +273,13 @@ foreach($images as $k=>$val):
 		}
 		echo "</td>
 		</tr>
-		<tr valign=top bgcolor='#DCF3DA'>
+		<tr valign=top bgcolor='#E1E7F3'>
 		<td>Fade in</td>
 		<td>
 		<input type='checkbox' name='fade_in[$k]' $fade_in_checked> 
 		</td>
 		</tr>
-		<tr valign=top bgcolor='#DCF3DA'>
+		<tr valign=top bgcolor='#E1E7F3'>
 		<td>Audio fade in</td>
 		<td>
 		<input type='checkbox' name='audio_fade_in[$k]' $audio_fade_in_checked> 
@@ -282,7 +316,10 @@ foreach($images as $k=>$val):
 			foreach ($fonts_array as $font_num=>$font_line) {
 				$rtrim_font_line=rtrim($font_line);
 				echo "<option value='$rtrim_font_line'> $rtrim_font_line </option>\n";
-			}				
+			}	
+			$crop_image_option='no';
+			if( $crop_image ) { $crop_image_option='yes'; }
+
 			echo "
 			</select>
 		</td></tr>
@@ -290,6 +327,12 @@ foreach($images as $k=>$val):
 		<tr><td ".$form_fied_alert['text_color'][$k]." >Text color:</td><td><input name='text_color[$k]'  class='jscolor' value='$text_color' size=6> </td></tr>
 		<tr><td ".$form_fied_alert['text_boxborder_color'][$k]." >Box color:</td><td><input name='text_boxborder_color[$k]' class='jscolor' value='$text_boxborder_color' size=6></td></tr>
 		<tr><td ".$form_fied_alert['text_boxopacity'][$k]." >Box opacity (%):</td><td><input type='number' name='text_boxopacity[$k]' value='$text_boxopacity' min='0' max='100' size=3> </td></tr>
+		<tr><td ".$form_fied_alert['text_wrap'][$k]." >Text wrap</td><td><input type='number' name='text_wrap[$k]' value='$text_wrap' min='0' max='150' size=4 > </td></tr>
+		<tr><td ".$form_fied_alert['crop_image'][$k]." >Resize and crop the image</td><td><select name='crop_image[$k]'>
+				<option value='$crop_image' selected> $crop_image_option </option> 
+				<option value='1'> yes </option> 
+				<option value='0'> no </option>
+				</select></td></tr>
 		</table>
 		";
 
@@ -301,7 +344,18 @@ endforeach;
 		if( $audio_fade_out ) {
 			$audio_fade_out_checked='checked' ;			
 		}
+		if( $disable_crest_for_last_image ) {
+			$disable_crest_for_last_image_checked='checked' ;			
+		}
+		
+		#disable_crest_for_last_image
 		echo "</td>
+		</tr>
+		<tr valign=top bgcolor='#E1E7F3'>
+		<td>Disable crest and logo for the last image</td>
+		<td>
+		<input type=checkbox name='disable_crest_for_last_image[$last_record]' $disable_crest_for_last_image_checked> 
+		</td>
 		</tr>
 		<tr valign=top bgcolor='#E1E7F3'>
 		<td>Fade out</td>
@@ -315,20 +369,6 @@ endforeach;
 		<input type=checkbox name='audio_fade_out[$last_record]' $audio_fade_out_checked> 
 		</td>
 		</tr>
-		";	
-		
-    echo "<!--
-        <tr>
-			<td>Audio effects:</td>
-			<td>
-				<table>
-					<tr><td>Enable audio:</td><td> </td></tr>			
-					<tr><td>Fade in:</td><td> </td></tr>			
-					<tr><td>Fade out:</td><td> </td></tr>			
-				</table>
-			</td>
-		</tr>
-		-->
 				<tr><td>
 				</td></tr>
 			<tr><td></td><td><input type='submit'  name='save' id='save' value='Save'> </td></tr>
@@ -343,9 +383,6 @@ endforeach;
 		<input type='hidden' name='project_id' value='$project_id'>
 		</form>
 	";
-	#echo "<pre>";
-	#echo var_dump($_POST) ;
-	#echo "</pre>";
 }
 else
 {
@@ -361,7 +398,8 @@ else
 	fwrite($myfile, json_encode ( $effects_info) );
 	fclose($myfile);		
 
-	generate_command ( $images, $audio, $effects_info, $logo );
+	generate_command ( $images, $audio, $effects_info, $logo, $crest, $project_id );
+
 
 	foreach($messages as $value)
 		{
@@ -375,19 +413,50 @@ else
 		
 
 
-function generate_command ( $images, $audio, $effects, $logo ) {
+function generate_command ( $images, $audio, $effects, $logo, $crest, $project_id ) {
 
+global $main_upload_dir;
 global $upload_dir;
 global $upload_url;
 global $bin_dir;
 global $output_width;
 global $output_height;
+
 $audio_file=$audio[1][name];
 $audio_enable=$audio[1]['audio_enable'];
+$audio_names=array();
+
+
+
+
+if( $audio[1]['audio_rnd'] ) {
+	$audio_file=$audio[ array_rand ( $audio ) ]['name'] ;
+} 
+else {
+	foreach($audio as $k=>$val) {
+		if( $val['audio_selected'] ) {
+			$audio_file=$val['name'];
+		}
+	}
+}
+
+
+
 $logo_file=$logo[1][name];
 $logo_x=$logo[1][logo_x];
 $logo_y=$logo[1][logo_y];
+$logo_w=$logo[1][logo_w];
+$logo_h=$logo[1][logo_h];
 $logo_enable=$logo[1][logo_enable];
+
+$crest_file=$crest[1][name];
+$crest_x=$crest[1][crest_x];
+$crest_y=$crest[1][crest_y];
+$crest_w=$crest[1][crest_w];
+$crest_h=$crest[1][crest_h];
+$crest_enable=$crest[1][crest_enable];
+
+#$effects[$k]['disable_crest_for_last_image']
 
 $shell="#!/bin/bash
 #	this script generated by \$0
@@ -397,6 +466,7 @@ FFPROBE=ffprobe
 #FFPROBE=/usr/bin/ffprobe
 #CONVERT=/usr/bin/convert
 LOG=$upload_dir/log.txt
+MY_PID_FILE=$main_upload_dir/processing.pid
 
 OUTFILE=$upload_dir/outfile.mp4
 OUTFILE_URL=./outfile.mp4
@@ -420,9 +490,39 @@ w2log() {
 }
 
 echo "<html><head><meta http-equiv=refresh content=10 ></head><body><a href=../../index.php> [ Home ] </a><hr><pre>" >  $HTML_REPORT
+
+if [ -f  $MY_PID_FILE ]; then 
+	for i in `seq 120`; do
+		ps --pid `cat $MY_PID_FILE` -o cmd h  >/dev/null 2>&1 
+		if [ $? -eq 0 ]; then
+			# previrouse job_starter dont finished yet
+			# exit 0
+			w2log "Waiting processing of another task. Waiting 30 seconds. $i "
+			sleep 30
+		else
+			echo  $$  > $MY_PID_FILE
+			RUN=1
+			break
+		fi	
+	done
+else
+	echo  $$  > $MY_PID_FILE
+	RUN=1
+fi
+
+
+if [ "x$RUN" == "x" ]; then
+		w2log "Timeout of waiting. Sorry, cannot start processing" 
+		exit 1
+fi	
+
+
 w2log "Start processing"
 
 ';
+$shell.="
+w2log \"Processing log file <a href='./make_slideshow.log'>make_slideshow.log</a>\"
+";
 
 $first_image=1;
 $last_image=0;
@@ -452,6 +552,9 @@ foreach($images as $k=>$val):
 		$text_boxborder_color= $effects[$k]['text_boxborder_color'];
 		$text_boxopacity= $effects[$k]['text_boxopacity'];
 		$transition= $effects[$k]['transition'];
+		$text_wrap= $effects[$k]['text_wrap'];
+		$crop_image= $effects[$k]['crop_image'];
+		$disable_crest_for_last_image=$effects[$k]['disable_crest_for_last_image'];
 		
 		if( ! $duration ) $duration=10;
 
@@ -495,20 +598,43 @@ foreach($images as $k=>$val):
 		if ( $ratio_image > $ratio_output ) {			
 			$new_height=$output_height;
 			$new_width = $new_height * $ratio_image;
+			#$output_width=320;
+			#$output_height=240;
+            #$imgout = "ffmpeg -i 2_19.jpg -y -f image2  -ss 7 -filter_complex  \"color=black:${output_width}x${output_height}[v1]; [0:v] scale='if(gt(a,${output_width}/${output_height}),${output_width},-1)':'if(gt(a,${output_width}/${output_height}),-1,${output_height})' [v2]; [v1][v2] overlay=enable='between( t, 0, \$DISABLE_CREST_TIME )':x='if(gt(W/H,w/h),(W-w)/2,0 )':y='if(gt(W/H,w/h),0,(H-h)/2 )' \" -vframes 1  320x240.jpg";
+			
 
 			if( $animation == 'none' ) {
-				$filters=" scale=w=$new_width*1.05:h=-2, crop=w=$output_width:h=$output_height, setsar=1 ";								
+				if( ! $crop_image ) {
+					$filters=" color=black:${output_width}x${output_height}[v1]; [0:v] scale='if(gt(a,${output_width}/${output_height}),${output_width},-1)':'if(gt(a,${output_width}/${output_height}),-1,${output_height})' [v2]; [v1][v2] overlay=x='if(gt(W/H,w/h),(W-w)/2,0 )':y='if(gt(W/H,w/h),0,(H-h)/2 )', setsar=1 ";
+				} else {
+					$filters=" scale=w=$new_width*1.05:h=-2, crop=w=$output_width:h=$output_height, setsar=1 ";													
+				}
 			}
 			
 			if( $animation == 'rotate' ) {
-				$filters=" scale=w=-2:$new_height*1.4, rotate=a='if(lt(t,20), PI*t/360 , PI*20/360)':c=black:ow=$output_width:oh=$output_height, setsar=1 "; 
+				if( ! $crop_image ) {
+					#$filters=" color=black:${output_width}x${output_height}[v1]; [0:v] scale='if(gt(a,${output_width}/${output_height}),${output_width},-1)':'if(gt(a,${output_width}/${output_height}),-1,${output_height})' [v2]; [v1][v2] overlay=x='if(gt(W/H,w/h),(W-w)/2,0 )':y='if(gt(W/H,w/h),0,(H-h)/2 )', scale=w=-2:$new_height*1.4, rotate=a='if(lt(t,20), PI*t/360 , PI*20/360)':c=black:ow=$output_width:oh=$output_height, setsar=1 ";
+					$filters=" color=black:${output_width}x${output_height}[v1]; [0:v] scale='if(gt(a,${output_width}/${output_height}),${output_width},-1)':'if(gt(a,${output_width}/${output_height}),-1,${output_height})' [v2]; [v1][v2] overlay=x='if(gt(W/H,w/h),(W-w)/2,0 )':y='if(gt(W/H,w/h),0,(H-h)/2 )',  rotate=a='if(lt(t,20), PI*t/360 , PI*20/360)':c=black:ow=$output_width:oh=$output_height, setsar=1 ";
+				} else {
+					$filters=" scale=w=-2:$new_height*1.4, rotate=a='if(lt(t,20), PI*t/360 , PI*20/360)':c=black:ow=$output_width:oh=$output_height, setsar=1 "; 
+				}
 			}			
 
 			if( $animation == 'rotate_ccw' ) {
-				$filters=" scale=w=-2:$new_height*1.4, rotate=a='if(lt(t,20), -PI*t/360 , -PI*20/360)':c=black:ow=$output_width:oh=$output_height, setsar=1 "; 
+				if( ! $crop_image ) {
+					#$filters=" color=black:${output_width}x${output_height}[v1]; [0:v] scale='if(gt(a,${output_width}/${output_height}),${output_width},-1)':'if(gt(a,${output_width}/${output_height}),-1,${output_height})' [v2]; [v1][v2] overlay=x='if(gt(W/H,w/h),(W-w)/2,0 )':y='if(gt(W/H,w/h),0,(H-h)/2 )', scale=w=-2:$new_height*1.4, rotate=a='if(lt(t,20), -PI*t/360 , -PI*20/360)':c=black:ow=$output_width:oh=$output_height, setsar=1 ";
+					$filters=" color=black:${output_width}x${output_height}[v1]; [0:v] scale='if(gt(a,${output_width}/${output_height}),${output_width},-1)':'if(gt(a,${output_width}/${output_height}),-1,${output_height})' [v2]; [v1][v2] overlay=x='if(gt(W/H,w/h),(W-w)/2,0 )':y='if(gt(W/H,w/h),0,(H-h)/2 )', rotate=a='if(lt(t,20), -PI*t/360 , -PI*20/360)':c=black:ow=$output_width:oh=$output_height, setsar=1 ";
+				} else {
+					$filters=" scale=w=-2:$new_height*1.4, rotate=a='if(lt(t,20), -PI*t/360 , -PI*20/360)':c=black:ow=$output_width:oh=$output_height, setsar=1 "; 
+				}				
 			}			
 			if( $animation == 'zoompan' ) {
-				$filters=" scale=w=2*iw:h=2*ih, zoompan=z=pzoom*1.0003:d=1:x=0:0:s=${output_width}x${output_height}, setsar=1 "; 
+				if( ! $crop_image ) {
+					$filters=" color=black:${output_width}x${output_height}[v1]; [0:v] scale='if(gt(a,${output_width}/${output_height}),${output_width},-1)':'if(gt(a,${output_width}/${output_height}),-1,${output_height})' [v2]; [v1][v2] overlay=x='if(gt(W/H,w/h),(W-w)/2,0 )':y='if(gt(W/H,w/h),0,(H-h)/2 )', scale=w=2*iw:h=2*ih, zoompan=z=pzoom*1.0003:d=1:x=0:0:s=${output_width}x${output_height}, setsar=1  ";
+				} else {
+					$filters=" scale=w=2*iw:h=2*ih, zoompan=z=pzoom*1.0003:d=1:x=0:0:s=${output_width}x${output_height}, setsar=1 "; 
+				}				
+				#$filters=" scale=w=2*iw:h=2*ih, zoompan=z=pzoom*1.0003:d=1:x=0:0:s=${output_width}x${output_height}, setsar=1 "; 
 				#$filters=" scale=w=2*iw:h=2*ih, zoompan=z=pzoom*1.001:d=1:x='if(gte(zoom,1.5),x,x+1/a)':y='if(gte(zoom,1.5),y,y+1)':s=${output_width}x${output_height}, setsar=1 "; 
 				#scale=w=2*iw:h=2*ih, zoompan=z=pzoom*1.002:d=1:x='if(gte(zoom,1.5),x,x+1/a)':y='if(gte(zoom,1.5),y,y+1)':s=${output_width}x${output_height}
 			}			
@@ -528,19 +654,39 @@ foreach($images as $k=>$val):
 		else 
 		{
 			if( $animation == 'none' ) {
-				$filters=" scale=w=-2:h=$new_height, crop=w=$output_width:h=$output_height, setsar=1 ";				
-			}
+				if( ! $crop_image ) {
+					$filters=" color=black:${output_width}x${output_height}[v1]; [0:v] scale='if(gt(a,${output_width}/${output_height}),${output_width},-1)':'if(gt(a,${output_width}/${output_height}),-1,${output_height})' [v2]; [v1][v2] overlay=x='if(gt(W/H,w/h),(W-w)/2,0 )':y='if(gt(W/H,w/h),0,(H-h)/2 )', setsar=1 ";
+				} else {
+					$filters=" scale=w=-2:h=$new_height, crop=w=$output_width:h=$output_height, setsar=1 ";				
+				}
+			}				
 			
 			if( $animation == 'rotate' ) {
-				$filters=" scale=w=-2:$new_height*1.4, rotate=a='if(lt(t,20), PI*t/360 , PI*20/360)':c=black:ow=$output_width:oh=$output_height, setsar=1 "; 
+				if( ! $crop_image ) {
+					#$filters=" color=black:${output_width}x${output_height}[v1]; [0:v] scale='if(gt(a,${output_width}/${output_height}),${output_width},-1)':'if(gt(a,${output_width}/${output_height}),-1,${output_height})' [v2]; [v1][v2] overlay=x='if(gt(W/H,w/h),(W-w)/2,0 )':y='if(gt(W/H,w/h),0,(H-h)/2 )', scale=w=-2:$new_height*1.4, rotate=a='if(lt(t,20), PI*t/360 , PI*20/360)':c=black:ow=$output_width:oh=$output_height, setsar=1 ";
+					$filters=" color=black:${output_width}x${output_height}[v1]; [0:v] scale='if(gt(a,${output_width}/${output_height}),${output_width},-1)':'if(gt(a,${output_width}/${output_height}),-1,${output_height})' [v2]; [v1][v2] overlay=x='if(gt(W/H,w/h),(W-w)/2,0 )':y='if(gt(W/H,w/h),0,(H-h)/2 )', rotate=a='if(lt(t,20), PI*t/360 , PI*20/360)':c=black:ow=$output_width:oh=$output_height, setsar=1 ";
+				} else {
+					$filters=" scale=w=-2:$new_height*1.4, rotate=a='if(lt(t,20), PI*t/360 , PI*20/360)':c=black:ow=$output_width:oh=$output_height, setsar=1 "; 
+				}
 			}			
 
 			if( $animation == 'rotate_ccw' ) {
-				$filters=" scale=w=-2:$new_height*1.4, rotate=a='if(lt(t,20), -PI*t/360 , -PI*20/360)':c=black:ow=$output_width:oh=$output_height, setsar=1 "; 
+				if( ! $crop_image ) {
+					#$filters=" color=black:${output_width}x${output_height}[v1]; [0:v] scale='if(gt(a,${output_width}/${output_height}),${output_width},-1)':'if(gt(a,${output_width}/${output_height}),-1,${output_height})' [v2]; [v1][v2] overlay=x='if(gt(W/H,w/h),(W-w)/2,0 )':y='if(gt(W/H,w/h),0,(H-h)/2 )', scale=w=-2:$new_height*1.4, rotate=a='if(lt(t,20), -PI*t/360 , -PI*20/360)':c=black:ow=$output_width:oh=$output_height, setsar=1 ";
+					$filters=" color=black:${output_width}x${output_height}[v1]; [0:v] scale='if(gt(a,${output_width}/${output_height}),${output_width},-1)':'if(gt(a,${output_width}/${output_height}),-1,${output_height})' [v2]; [v1][v2] overlay=x='if(gt(W/H,w/h),(W-w)/2,0 )':y='if(gt(W/H,w/h),0,(H-h)/2 )',  rotate=a='if(lt(t,20), -PI*t/360 , -PI*20/360)':c=black:ow=$output_width:oh=$output_height, setsar=1 ";
+				} else {
+					$filters=" scale=w=-2:$new_height*1.4, rotate=a='if(lt(t,20), -PI*t/360 , -PI*20/360)':c=black:ow=$output_width:oh=$output_height, setsar=1 "; 
+				}								
 			}			
 
 			if( $animation == 'zoompan' ) {
-				$filters=" scale=w=2*iw:h=2*ih, zoompan=z=pzoom*1.0003:d=1:x=0:0:s=${output_width}x${output_height}, setsar=1 "; 
+				if( ! $crop_image ) {
+					$filters=" color=black:${output_width}x${output_height}[v1]; [0:v] scale='if(gt(a,${output_width}/${output_height}),${output_width},-1)':'if(gt(a,${output_width}/${output_height}),-1,${output_height})' [v2]; [v1][v2] overlay=x='if(gt(W/H,w/h),(W-w)/2,0 )':y='if(gt(W/H,w/h),0,(H-h)/2 )',scale=w=2*iw:h=2*ih, zoompan=z=pzoom*1.0003:d=1:x=0:0:s=${output_width}x${output_height}, setsar=1  ";
+				} else {
+					$filters=" scale=w=2*iw:h=2*ih, zoompan=z=pzoom*1.0003:d=1:x=0:0:s=${output_width}x${output_height}, setsar=1 "; 
+				}				
+				
+				#$filters=" scale=w=2*iw:h=2*ih, zoompan=z=pzoom*1.0003:d=1:x=0:0:s=${output_width}x${output_height}, setsar=1 "; 
 				#scale=w=2*iw:h=2*ih, zoompan=z=pzoom*1.002:d=1:x='if(gte(zoom,1.5),x,x+1/a)':y='if(gte(zoom,1.5),y,y+1)':s=${output_width}x${output_height}
 			}			
 			
@@ -557,23 +703,7 @@ foreach($images as $k=>$val):
 		
 		
 		# prepare images with text 
-		/*
-		if( ! ctype_space( $text ) && $text!="" ) 
-		{
-			$text_boxopacity_fixed=$text_boxopacity/100;
-			$text_fixed= preg_replace( '/[^[:cntrl:]]/', '',$text);
-			
-			
-			$shell.="
-			w2log 'Make image with text box $upload_dir/${k}_textbox.png'
-				
-				$bin_dir/make_textbox.pl --text '$text' --output '$upload_dir/${k}_textbox.png' --textcolor=$text_color --boxcolor $text_boxborder_color --fontpath '$font' --fontsize $font_size --transparent $text_boxopacity
-			if [ \$? -ne 0 ]; then
-				w2log 'Last command processing error'
-			fi
-			";			
-		}
-		*/
+
 		
 		$loop=" -loop 1 -i $image -ss 0 -t $duration ";
 		
@@ -592,18 +722,29 @@ foreach($images as $k=>$val):
 		$text_boxopacity_fixed=$text_boxopacity/100;
 		$box_w=$output_width-20;
 		#$text= wordwrap( $text, $output_weidth/22 )	;
-		$box_h=intval ( $font_size * 1.05 *  count( explode( PHP_EOL, $text ) ) ) ;
+		if( $text_wrap ) {
+			$text= wordwrap( $text, $text_wrap, PHP_EOL, true )	;	
+		} else {
+			$text= image2video::reWrapText( $text, $output_width, $font_size  )	;			
+		}
+		
+		#$box_h=intval ( $font_size * 1.05 *  count( explode( PHP_EOL, $text ) ) ) ;
+		$box_h=intval ( $font_size * 1.3 *  count( explode( PHP_EOL, $text ) ) ) ;
 		$box_x=10;
-		$box_y=$output_height-$box_h-10;
+		#$box_y=$output_height-$box_h-10;
+		$box_y=( $output_height-$box_h ) /2 ;
 		$box_start_transition=2;
 		$text_start_transition=3;		
+		#$text_y=$box_y+intval( $font_size*0.2 ) ;		
+		#$text_x=$box_x+intval( $font_size*0.2 );	
 		$text_y=$box_y+intval( $font_size*0.2 ) ;		
 		$text_x=$box_x+intval( $font_size*0.2 );	
-		
+		#x=(w-text_w)/2: y=(h-text_h)/2
 	
 		if( $text ) {			
 			$box_for_text=" [0v] ;  color=color=0x${text_boxborder_color}@ ${text_boxopacity_fixed}:size=${box_w}x${box_h} , fade=t=in:st=$box_start_transition:d=1:alpha=1 [a] ;[0v][a]  overlay=x=$box_x:y=$box_y "; 
-			$text_in_box=", drawtext=fontfile=$font:text='$text': fontcolor=0x$text_color: fontsize=$font_size: alpha='if( lte(t, $text_start_transition+1 ), if( lte( t, $text_start_transition ),0 , t-$text_start_transition  )  ,1 )':x=$text_x:y=$text_y ";
+			#$text_in_box=", drawtext=fontfile=$font:text='$text': fontcolor=0x$text_color: fontsize=$font_size: alpha='if( lte(t, $text_start_transition+1 ), if( lte( t, $text_start_transition ),0 , t-$text_start_transition  )  ,1 )':x=$text_x:y=$text_y ";
+			$text_in_box=", drawtext=fontfile=$font:text='$text': borderw=1: bordercolor=0x333333: fontcolor=0x$text_color: fontsize=$font_size: alpha='if( lte(t, $text_start_transition+1 ), if( lte( t, $text_start_transition ),0 , t-$text_start_transition  )  ,1 )':x=(w-text_w)/2: y=(h-text_h)/2 ";
 		}
 		$shell.="
 		w2log 'Create video $upload_dir/$k.mp4'
@@ -620,11 +761,13 @@ endforeach;
 		";
 
 $first_video='';
+$last_video='';
 $tmp1_video="$upload_dir/tmp1.mp4";
 $tmp2_video="$upload_dir/tmp2.mp4";
 
 if( count( $images ) > 1 ) {
 foreach($images as $k=>$val):
+	$last_video="$upload_dir/$k.mp4";
 	if( $first_video=='' ) {
 		$first_video="$upload_dir/$k.mp4";
 		continue;
@@ -671,6 +814,8 @@ endforeach;
 }
 		$shell.="
 		DURATION=`\$FFPROBE -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 '$tmp2_video'`
+		LAST_VIDEO_DURATION=`\$FFPROBE -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 '$last_video'`
+		DISABLE_CREST_TIME=` bc -l <<< \"scale=2; \$DURATION - \$LAST_VIDEO_DURATION \"` 
 		FADE_OUT_START=` bc -l <<< \"scale=2; \$DURATION - 1 \"` 
 		";		
 	if ( $audio_enable ) {
@@ -678,6 +823,7 @@ endforeach;
 		if [ -f '$audio_file' ]; then			
 			w2log 'Add audio to $tmp2_video'
 				timeout \$TIMEOUT \$FFMPEG   -loglevel warning -y -i  $tmp2_video -t \$DURATION -i $audio_file  -shortest -filter_complex \"[0:v] $show_fade_in null $show_fade_out [v];[1:a] $audio_fade_in aformat=sample_fmts=s16:channel_layouts=stereo,aresample=44100 $audio_fade_out [a]\" -map '[a]' -map '[v]'  -strict -2  \$OUTFILE
+				#timeout \$TIMEOUT \$FFMPEG   -loglevel warning -y -i  $tmp2_video -t \$DURATION -f lavfi -i amovie=$audio_file:loop=100  -shortest -filter_complex \"[0:v] $show_fade_in null $show_fade_out [v];[1:a] $audio_fade_in aformat=sample_fmts=s16:channel_layouts=stereo,aresample=44100 $audio_fade_out [a]\" -map '[a]' -map '[v]'  -strict -2  \$OUTFILE
 				if [ \$? -ne 0 ]; then
 					w2log 'Last command processing error. Cannot add audio track to video'
 					mv -f $tmp2_video \$OUTFILE
@@ -694,25 +840,79 @@ endforeach;
 			timeout \$TIMEOUT \$FFMPEG   -loglevel warning -y -i  $tmp2_video -t \$DURATION -shortest -filter_complex \"[0:v] $show_fade_in null $show_fade_out [v]\" -map '0:a?' -map '[v]'  -strict -2  \$OUTFILE
 		";			
 	}
+	/*
+	echo "<pre>";
+	echo var_dump( $logo_enable, $crest, $crest_enable );
+	echo "</pre>";
+	*/
 	if ( $logo_enable ) {
-		$shell.="		
+		if ( $crest_enable ) {
+			$shell.="				
+			if [ -f '$logo_file'  ]; then
+				if [ -f '$crest_file'  ]; then
+					w2log 'Add logo and crest to $tmp2_video'
+					mv -f \$OUTFILE $tmp2_video
+					timeout \$TIMEOUT \$FFMPEG  -loglevel warning -y -i  $tmp2_video -t \$DURATION -loop 1 -i $logo_file  -t \$DURATION -loop 1 -i $crest_file  -t \$DURATION -shortest -filter_complex \"[2:v]scale=w=${crest_w}:h=${crest_h}:force_original_aspect_ratio=decrease[2v];[1:v]scale=w=${logo_w}:h=${logo_h}:force_original_aspect_ratio=decrease[1v];[0:v][1v]overlay=enable='between( t, 0, \$DISABLE_CREST_TIME )':x=$logo_x:y=$logo_y [v1] ; [v1][2v]overlay=enable='between( t, 0, \$DISABLE_CREST_TIME )':x=$crest_x:y=$crest_y [v]\" -map '0:a?' -map '[v]'  -strict -2  \$OUTFILE
+					if [ \$? -ne 0 ]; then
+						w2log 'Last command processing error. Cannot add logo to video'
+						mv -f $tmp2_video \$OUTFILE
+					fi		
+				else
+					w2log 'Crest file $crest_file do not exist. Will added only logo'									
+					w2log 'Add logo to $tmp2_video'
+					mv -f \$OUTFILE $tmp2_video
+					timeout \$TIMEOUT \$FFMPEG  -loglevel warning -y -i  $tmp2_video -t \$DURATION -loop 1 -i $logo_file   -shortest -filter_complex \"[1:v]scale=w=${logo_w}:h=${logo_h}:force_original_aspect_ratio=decrease[1v];[0:v][1v]overlay=enable='between( t, 0, \$DISABLE_CREST_TIME )':x=$logo_x:y=$logo_y [v]\" -map '0:a?' -map '[v]'  -strict -2  \$OUTFILE
+					if [ \$? -ne 0 ]; then
+						w2log 'Last command processing error. Cannot add logo to video'
+						mv -f $tmp2_video \$OUTFILE
+					fi		
+				fi
+			else
+				w2log 'Logo file $logo_file do not exist'				
+			fi
+			";						
 
-		if [ -f '$logo_file'  ]; then			
-				w2log 'Add logo to $tmp2_video'
-				mv -f \$OUTFILE $tmp2_video
-				timeout \$TIMEOUT \$FFMPEG  -loglevel warning -y -i  $tmp2_video -t \$DURATION -loop 1 -i $logo_file  -shortest -filter_complex '[0:v][1:v]overlay=x=$logo_x:y=$logo_y [v]' -map '0:a?' -map '[v]'  -strict -2  \$OUTFILE
-				if [ \$? -ne 0 ]; then
-					w2log 'Last command processing error. Cannot add logo to video'
-					mv -f $tmp2_video \$OUTFILE
-				fi		
-		else
-			w2log 'Logo file $logo_file do not exist'				
-		fi
-		";			
+		} else {
+			$shell.="				
+			if [ -f '$logo_file'  ]; then			
+					w2log 'Add logo to $tmp2_video'
+					mv -f \$OUTFILE $tmp2_video
+					timeout \$TIMEOUT \$FFMPEG  -loglevel warning -y -i  $tmp2_video -t \$DURATION -loop 1 -i $logo_file   -shortest -filter_complex \"[1:v]scale=w=${logo_w}:h=${logo_h}:force_original_aspect_ratio=decrease[1v];[0:v][1v]overlay=enable='between( t, 0, \$DISABLE_CREST_TIME )':x=$logo_x:y=$logo_y [v]\" -map '0:a?' -map '[v]'  -strict -2  \$OUTFILE
+					if [ \$? -ne 0 ]; then
+						w2log 'Last command processing error. Cannot add logo to video'
+						mv -f $tmp2_video \$OUTFILE
+					fi		
+			else
+				w2log 'Logo file $logo_file do not exist'				
+			fi
+			";						
+		}
+	} else {		
+		if ( $crest_enable ) {
+			$shell.="				
+			if [ -f '$crest_file'  ]; then			
+					w2log 'Add crest to $tmp2_video'
+					mv -f \$OUTFILE $tmp2_video
+					timeout \$TIMEOUT \$FFMPEG  -loglevel warning -y -i  $tmp2_video -t \$DURATION -loop 1 -i $crest_file  -shortest -filter_complex \"[1:v]scale=w=${crest_w}:h=${crest_h}:force_original_aspect_ratio=decrease[1v];[0:v][1v]overlay=enable='between( t, 0, \$DISABLE_CREST_TIME )':x=$crest_x:y=$crest_y [v]\" -map '0:a?' -map '[v]'  -strict -2  \$OUTFILE
+					if [ \$? -ne 0 ]; then
+						w2log 'Last command processing error. Cannot add crest to video'
+						mv -f $tmp2_video \$OUTFILE
+					fi		
+			else
+				w2log 'crest file $crest_file do not exist'				
+			fi
+			";						
+
+		} 
 	}		
+	
+	
+	
 		$shell.="		
 		w2log \"File  \$OUTFILE is ready. <a href='\$OUTFILE_URL'>\$OUTFILE_URL</a>\"
 		w2log \"Processing finished\"
+		w2log \"Upload this file to <a href='../../upload_to_youtube.php?project_id=$project_id'>youtube</a>\"
+		rm \$MY_PID_FILE
 		";
 
 	$myfile = fopen("$upload_dir/make_slideshow.sh", "w") ;

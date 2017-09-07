@@ -4,7 +4,13 @@
     <meta charset="UTF-8">
     <title>Upload audio file</title>
 	<LINK href='main.css' type=text/css rel=stylesheet>
-	
+<script>
+  function confirm_prompt( text,url ) {
+     if (confirm( text )) {
+      window.location = url ;
+    }
+  }
+</script>	
 </head>
 <body>
 <a href="index.php"> [ Home ] </a>
@@ -40,52 +46,88 @@ $effects_info= array();
 $string = file_get_contents("$upload_dir/audio.txt");
 $audio = json_decode($string, true);
 
-$string = file_get_contents("$upload_dir/images.txt");
-$images = json_decode($string, true);
 
-$string = file_get_contents("$upload_dir/effects.txt");
-$effects = json_decode($string, true);
-
-$string = file_get_contents("$upload_dir/project.txt");
-$project = json_decode($string, true);
-
-$string = file_get_contents("$upload_dir/logo.txt");
-$logo = json_decode($string, true);
 
 $files_info=array();
 
 	echo '<h3> Project: '.$project['project_name'].'</h3>';	
-	echo "// <a href='add_logo.php?project_id=$project_id'>Logo</a> // <a href='upload_audio.php?project_id=$project_id'>Audio</a> // <a href='add_new_image.php?project_id=$project_id'>Add new image</a> // <a href='change_image_order.php?project_id=$project_id'>Change image order</a> // <a href='delete_image.php?project_id=$project_id'>Remove the image</a> // <a href='edit_effect.php?project_id=$project_id'>Edit effect</a> //<hr><br>";	
+	echo image2video::showMenu( $project_id );
 
 
-
-
-if( $audio[1]['url'] ) {
-	$audio_filename=$audio[1]['name'];
-	$audio_url=$audio[1]['url'];
-	$audio_enable_checked='';
-	if( $audio[1]['audio_enable']==1 ) {
-		$audio_enable_checked='checked';
-	}
+if( ! $audio['name'] ) {
+	$audio[1]['audio_enable']=1;
+	$audio[1]['audio_rnd']=1;
 }
-else {	
+
+	
+$audio_enable_checked='';
+$audio_rnd_checked='';
+
+$audio_enable=$audio[1]['audio_enable'];
+$audio_rnd=$audio[1]['audio_rnd'];
+
+if( $audio_enable ) {
 	$audio_enable_checked='checked';
 }
+if( $audio_rnd ) {
+	$audio_rnd_checked='checked' ;
+}
+
+
+
+
+
+
+
+if( $_GET['del'] && $_GET['audio_id'] && $_GET['project_id'] ) {
+	$audio_new=$audio;
+	$audio_id=$_GET['audio_id'];
+	unset( $audio[ $audio_id ] );
+	$audio[1]['audio_rnd']= $audio_rnd;
+	$audio[1]['audio_enable']=$audio_enable;
+}
+/*
+echo '<pre>';
+    print_r($audio);
+echo '</pre>';
+*/
 
 $form="
 
-	<table>		
+	<table border=1>		
 		<form action='upload_audio.php' method='post' multipart='' enctype='multipart/form-data'>		
 			<input type='hidden' name='project_id' value='$project_id'>	
 		";
-		
-        if( $audio[1]['url'] ) {
-			$form.="<tr><td> Existing audio file</td><td><a href='$audio_url'> $audio_filename </a></td></tr>";
+foreach($audio as $k=>$val): 
+        if( $audio[$k]['url'] ) {
+			$audio_filename=$audio[$k]['name'];
+			$audio_url=$audio[$k]['url'];
+			$audio_selected_checked='';
+			if( $audio[$k]['audio_selected'] ) {				
+				$audio_selected_checked="checked";				
+			}
+			$form.="
+			<tr>
+				<td>Use this audio track</td>
+				<td><input type='radio'  name='audio_selected' value=$k $audio_selected_checked > </td>
+				<td><a href='$audio_url'> Audio $k </a></td>
+				<td>Change audio file</td><td><input type='file' name='audioform[]' multiple> </td>
+				<td>[ <a href='' onclick=\"confirm_prompt( 'Are you sure to remove this audio file?','?del=1&audio_id=$k&project_id=$project_id'); return false;\">Remove this audio</a> ] </td>
+			</tr>
+			";
 		}
+endforeach;	
 		
 $form.="			
-			<tr><td>Add/change audio file</td><td><input type='file' name='audioform[]' multiple> </td></tr>
-			<tr><td>Enable audio</td><td><input type='checkbox'  name='audio_enable' value='1' $audio_enable_checked > </td></tr>
+			<tr>
+				<td></td>
+				<td></td>
+				<td></a></td>
+				<td>Add audio file</td><td><input type='file' name='audioform[]' multiple> </td>
+				<td></td>
+			</tr>
+			<tr><td>Use randomize audio track</td><td><input type='checkbox'  name='audio_rnd' value='1' $audio_rnd_checked > </td><td></td><td></td></tr>
+			<tr><td>Enable audio</td><td><input type='checkbox'  name='audio_enable' value='1' $audio_enable_checked > </td><td></td><td></td></tr>
 			<tr>
 				<td><input type='submit' name='save' id='save' value='Save file'></form></td>
 
@@ -93,19 +135,20 @@ $form.="
 	</table>
 	";
 
-if( $_POST['save'] ) {	
+if( $_POST['save'] || $_GET['del'] ) {	
 
+$files_info=&$audio;
 $audioform = $_FILES['audioform'];
-if( file_exists($audioform['tmp_name'][0])) # check if file uploaded
+if(!empty($audioform))
 {
 
 $audio_desc = image2video::reArrayFiles($audioform);
-#echo '<pre>';
-#    print_r($audio_desc);
-#echo '</pre>';
+
     $k=0;
     foreach($audio_desc as $val)
     {
+		$k++;
+		$files_info[$k]['audio_selected']=0;
 		if( empty($val['name'])) 
 		{
 			continue;
@@ -142,7 +185,6 @@ $audio_desc = image2video::reArrayFiles($audioform);
 		{
 			$errors[]="Cannot save the file ".$val['name']." to $file_name";			
 		}
-		$k++;
 		$files_info[$k]=array(
 			'url'=>		$file_url,		
 			'name'=>	$file_name,
@@ -152,11 +194,18 @@ $audio_desc = image2video::reArrayFiles($audioform);
 		);
 
     }
-} else {
-	$files_info=&$audio;
-	$k=1;
-	$files_info[$k]['audio_enable']=$_POST['audio_enable'];	
-}	
+	if( $_POST['save'] ) {	
+		$files_info[1]['audio_enable']=$_POST['audio_enable'];	
+		$files_info[1]['audio_rnd']=$_POST['audio_rnd'];	
+		$audio_selected=$_POST['audio_selected'];
+		if( $audio_selected ) {
+			$files_info[ $audio_selected ]['audio_selected']=1;
+		}
+		$files_info[1]['audio_rnd']=$_POST['audio_rnd'];		
+	}
+} 
+
+
 
 	$myfile = fopen("$upload_dir/audio.txt", "w") ;
 	if( !$myfile ) 
@@ -174,7 +223,7 @@ $audio_desc = image2video::reArrayFiles($audioform);
 		{
 		echo "<font color=red>$value</font><br>";
 		}
-	if ( $k>0 ){
+
 		$form="
     <form action='edit_effect.php' method='post' multipart='' enctype='multipart/form-data'>	
 	<table>		
@@ -183,7 +232,6 @@ $audio_desc = image2video::reArrayFiles($audioform);
 	<input type='hidden' name='project_id' value='$project_id'>	
     </form>
 		";
-	}
 }
 
 

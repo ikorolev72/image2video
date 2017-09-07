@@ -77,7 +77,7 @@ $files_info=array();
 			
 			echo( "<pre>");
 			
-			foreach( $images as $k=>$val ):
+			foreach( $images as $k=>$val ){
 				if( $k==$new_image_id ) {
 					$new_images[$i]=$images[$image_id] ;
 					$new_effects[$i]=$effects[$image_id] ;		
@@ -89,7 +89,7 @@ $files_info=array();
 					$new_effects[$i]=$effects[$k] ;					
 					$i++;
 				}
-			endforeach;		
+			}		
 			if( !$replaced ) {
 				$new_images[$i]=$images[$image_id] ;
 				$new_effects[$i]=$effects[$image_id] ;
@@ -125,7 +125,9 @@ $effects = json_decode($string, true);
 if(!empty($images))
 {
 	echo '<h3> Project: '.$project['project_name'].'</h3>';	
-	echo "// <a href='add_logo.php?project_id=$project_id'>Logo</a> // <a href='upload_audio.php?project_id=$project_id'>Audio</a> // <a href='add_new_image.php?project_id=$project_id'>Add new image</a> // <a href='change_image_order.php?project_id=$project_id'>Change image order</a> // <a href='delete_image.php?project_id=$project_id'>Remove the image</a> // <a href='edit_effect.php?project_id=$project_id'>Edit effect</a> //<hr><br>";	
+	echo image2video::showMenu( $project_id );
+
+
 	
 	echo "<form action='change_image_order.php' method='post' multipart='' enctype='multipart/form-data'>
 			<table>

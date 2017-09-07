@@ -4,7 +4,13 @@
     <meta charset="UTF-8">
     <title>Upload images</title>
 	<LINK href='main.css' type=text/css rel=stylesheet>
-	
+<script>
+  function confirm_prompt( text,url ) {
+     if (confirm( text )) {
+      window.location = url ;
+    }
+  }
+</script>		
 </head>
 <body>
 <a href="index.php"> [ Home ] </a>
@@ -153,7 +159,7 @@ $img_desc = image2video::reArrayFiles($img);
 		}
 	if ( $k>0 ){
 		$form="
-    <form action='add_logo.php' method='post' multipart='' enctype='multipart/form-data'>	
+    <form action='add_crest.php' method='post' multipart='' enctype='multipart/form-data'>	
 	<table>		
         <tr><td></td><td><input type='submit' value='Next step'> </td></tr>
 	</table>

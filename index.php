@@ -83,7 +83,7 @@ if( $_POST['add'] ) {
 	</html>			
 	";
 	// renew the fonts list
-		$command="find /usr/share/fonts/truetype/ |grep ttf\$ >$basedir/fonts.txt 2>/dev/null";
+		$command="find /usr/share/fonts/truetype/ |grep ttf\$ >$main_upload_dir/fonts.txt 2>/dev/null";
 		#$command="convert -list font | awk '/Font:/ {print $2}' >$basedir/fonts.txt 2>/dev/null";
 		exec ( $command );	
 	exit(0);

@@ -54,8 +54,12 @@ $logo = json_decode($string, true);
 $files_info=array();
 
 	echo '<h3> Project: '.$project['project_name'].'</h3>';	
-	echo "// <a href='add_logo.php?project_id=$project_id'>Logo</a> // <a href='upload_audio.php?project_id=$project_id'>Audio</a> // <a href='add_new_image.php?project_id=$project_id'>Add new image</a> // <a href='change_image_order.php?project_id=$project_id'>Change image order</a> // <a href='delete_image.php?project_id=$project_id'>Remove the image</a> // <a href='edit_effect.php?project_id=$project_id'>Edit effect</a> //<hr><br>";	
+	echo image2video::showMenu( $project_id );
+	
+//	echo "// <a href='upload_to_youtube.php?project_id=$project_id'>Upload to youtube</a> // <a href='add_crest.php?project_id=$project_id'>Crest</a> // <a href='add_logo.php?project_id=$project_id'>Logo</a> // <a href='upload_audio.php?project_id=$project_id'>Audio</a> // <a href='add_new_image.php?project_id=$project_id'>Add new image</a> // <a href='change_image_order.php?project_id=$project_id'>Change image order</a> // <a href='delete_image.php?project_id=$project_id'>Remove the image</a> // <a href='edit_effect.php?project_id=$project_id'>Edit effect</a> //<hr><br>";	
 
+$output_width=image2video::$output_width;
+$output_height=image2video::$output_height;	
 
 if( $logo[1]['url'] ) {
 	$logo_filename=$logo[1]['name'];
@@ -63,19 +67,25 @@ if( $logo[1]['url'] ) {
 	$logo_x=$logo[1]['logo_x'];
 	$logo_y=$logo[1]['logo_y'];
 	$logo_enable_checked='no_checked';
+
+	$logo_w=$logo[1]['logo_w'];
+	$logo_h=$logo[1]['logo_h'];
+
+
 	if( $logo[1]['logo_enable'] ) {
 		$logo_enable_checked='checked';
 	}
 }
 else {	
-	$logo_x=0;
+	$logo_x=$output_width-200+20;
 	$logo_y=0;	
 	$logo_enable_checked='checked';
+	$logo_w=200;
+	$logo_h=200;	
 }
 
 
-$output_width=image2video::$output_width;
-$output_height=image2video::$output_height;
+
 
 if( $project['width'] ) $output_width=$project['width'];
 if( $project['height'] ) $output_height=$project['height'];
@@ -94,6 +104,8 @@ $form.="
         <tr><td>Add/change logo</td><td><input type='file' name='img[]' multiple> </td></tr>
         <tr><td>X</td><td><input type='number'  name='logo_x' value='$logo_x' min='0' max='$output_width' > </td></tr>
         <tr><td>Y</td><td><input type='number'  name='logo_y' value='$logo_y' min='0' max='$output_height' > </td></tr>
+        <tr><td>Resize to width</td><td><input type='number'  name='logo_w' value='$logo_w' min='0' max='$output_width' > </td></tr>
+        <tr><td>Resize to height</td><td><input type='number'  name='logo_h' value='$logo_h' min='0' max='$output_height' > </td></tr>
         <tr><td>Enable logo</td><td><input type='checkbox'  name='logo_enable' value='1' $logo_enable_checked > </td></tr>
         <tr><td></td><td><input type='submit' name='save' value='Save'> </td></tr>	
 	<input type='hidden' name='project_id' value='$project_id'>		
@@ -196,9 +208,17 @@ $img_desc = image2video::reArrayFiles($img);
 			$_POST['logo_x']=0;
 			$_POST['logo_y']=0;
 		}
-
-	$files_info[$k]['logo_x']=$_POST['logo_x'];
-	$files_info[$k]['logo_y']=$_POST['logo_y'];
+	if( ! $_POST['logo_w']  || $_POST['logo_h'] || $_POST['logo_w']>$output_width || $_POST['logo_h']>$output_height ) 	
+		{
+			$errors[]="Logo width and height set to 200";
+			$_POST['logo_w']=200;
+			$_POST['logo_h']=200;
+		}
+		
+	$files_info[$k]['logo_x']=intval( $_POST['logo_x'] );
+	$files_info[$k]['logo_y']=intval( $_POST['logo_y'] );
+	$files_info[$k]['logo_w']=intval( $_POST['logo_w'] );
+	$files_info[$k]['logo_h']=intval( $_POST['logo_h'] );
 	$files_info[$k]['logo_enable']=$_POST['logo_enable'];
 	
 } else {
@@ -206,13 +226,22 @@ $img_desc = image2video::reArrayFiles($img);
 	$files_info=&$logo;
 	$k=1;
 	if( $_POST['logo_x'] <0 ) 		{
-			$messages[]="Logo x and y coordinates must be zero or positive. X and Y set to 0";
+			$errors[]="Logo x and y coordinates must be zero or positive. X and Y set to 0";
 			$_POST['logo_x']=0;
 			$_POST['logo_y']=0;
 		}
-
-	$files_info[$k]['logo_x']=$_POST['logo_x'];
-	$files_info[$k]['logo_y']=$_POST['logo_y'];
+	if( !$_POST['logo_w']  || !$_POST['logo_h'] || $_POST['logo_w']>$output_width || $_POST['logo_h']>$output_height ) 	
+		{
+			$errors[]="Logo width and height set to 200";
+			$_POST['logo_w']=200;
+			$_POST['logo_h']=200;
+		}
+	$files_info[$k]['logo_x']=intval( $_POST['logo_x'] );
+	$files_info[$k]['logo_y']=intval( $_POST['logo_y'] );
+	$files_info[$k]['logo_w']=intval( $_POST['logo_w'] );
+	$files_info[$k]['logo_h']=intval( $_POST['logo_h'] );
+	#$files_info[$k]['logo_x']=$_POST['logo_x'];
+	#$files_info[$k]['logo_y']=$_POST['logo_y'];
 	$files_info[$k]['logo_enable']=$_POST['logo_enable'];
 }	
 
