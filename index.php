@@ -106,6 +106,7 @@ echo '
 			<tr>
 				<td bgcolor=#FDF2FF><a href="index.php?new=1">Add new project</a></td>
 				<td></td>
+				<td></td>
 			</tr>
 
 		';
@@ -126,7 +127,8 @@ echo '
 				
 				echo "	<tr>
 							<td><a href='edit_effect.php?project_id=$project_id'>$project_name</a></td>
-							<td>[ <a href='' onclick=\"confirm_prompt( 'Are you sure to remove this project?','index.php?del=1&project_id=$project_id'); return false;\">Remove this project</a> ]</td>
+							<td>[ <a href='clone_project.php?old_project_id=$project_id'> Clone this project</a> ]</td>
+							<td>[ <a href='' onclick=\"confirm_prompt( 'Are you sure to remove this project?','?del=1&project_id=$project_id'); return false;\">Remove this project</a> ]</td>
 						</tr>\n";
 			}
 		}

@@ -116,6 +116,20 @@ function get_param( $val ) {
 }
 
 
+function copy_files ( $src, $dst, $allowed ) { 
+    $dir = opendir($src); 
+    #@mkdir($dst); 
+    while( false !== ( $file = readdir($dir)) ) { 
+		$ext = pathinfo($file, PATHINFO_EXTENSION );
+			if( in_array($ext, $allowed) ) {
+				link( "$src/$file" , "$dst/$file" );
+                # copy($src . '/' . $file,$dst . '/' . $file); 
+            } 
+    } 
+    closedir($dir); 
+	return true;
+} 
+
 
 
 }
