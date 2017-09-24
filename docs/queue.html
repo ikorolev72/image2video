@@ -1,0 +1,211 @@
+<html>
+<head>
+<title>
+QUEUE4JOB. API for tasks queue
+</title>
+</head>
+<body>
+<h2><a href='index.html'>API Docs for project image2html</a> </h2>
+<h3>QUEUE4JOB. API for tasks queue</h3>
+All request will be doing with web interface, parameter 'id' with json string, someting like: 
+<pre>http://your_ip/image2video/api/queue.php?in={%22action%22:%22set_status%22,%22id%22:%22150583385512136%22,%22status%22:%22paused%22}</pre>
+You can make such request with any browser, wget or curl.
+API answer - json string with field status and additional values, for example:
+<pre class='json_view'> {"status": "ok", "id":"1234567"} </pre> or 
+<pre class='json_view'> {"status": "error","errorno": "4000", "error": "Don't recived input parameters" } </pre>
+
+There are possible next actions: list, count, set_status, add_task .
+
+<hr>
+<h3>list</h3>
+By default, return first 50 tasks from queue.<br>
+Required parameters:<br>
+<ul>
+<li>"apikey":"315820"</li>
+<li>"action":"list"</li>
+</ul>
+Optional parameters:<br>
+<ul>
+<li>"id":"1234567" - show info only for task with this id</li>
+<li>"offset":"0" - select with offset from first record</li>
+<li>"limit":"50" - limit of rows in the answer </li>
+<li>"status":"failed" - select only records with this status </li>
+<li>"count":"failed" - select only records with this status </li>
+</ul>
+Samples:
+
+Request:
+<pre class='json_view'>
+{	
+	"apikey":"315820",
+	"action":"list",
+	"id":"150583385512136"
+}
+</pre>
+Answer:
+<pre class='json_view'>
+{
+    "status": "ok",
+    "rows": [
+        {
+            "id": "150583385512136",
+            "tasktype": "default",
+            "taskprice": 55,
+            "description": "One more task",
+            "json": "{\n    \"cmd\": \"ls -la\",\n    \"description\": \"One more task\",\n    \"tasktype\": \"default\",\n    \"taskprice\": 55,\n    \"id\": 150583385512136,\n    \"outfile\": \"\\\/var\\\/www\\\/html\\\/screenshot.unixpin.com\\\/image2video\\\/queue\\\/data\\\/20170919\\\/log\\\/150583385512136.out\",\n    \"errfile\": \"\\\/var\\\/www\\\/html\\\/screenshot.unixpin.com\\\/image2video\\\/queue\\\/data\\\/20170919\\\/log\\\/150583385512136.err\",\n    \"pid\": \"\\\/var\\\/www\\\/html\\\/screenshot.unixpin.com\\\/image2video\\\/queue\\\/data\\\/150583385512136.pid\"\n}",
+            "cmd": "ls -la",
+            "status": "failed",
+            "outfile": "\/var\/www\/html\/screenshot.unixpin.com\/image2video\/queue\/data\/20170919\/log\/150583385512136.out",
+            "errfile": "\/var\/www\/html\/screenshot.unixpin.com\/image2video\/queue\/data\/20170919\/log\/150583385512136.err",
+            "pid": "\/var\/www\/html\/screenshot.unixpin.com\/image2video\/queue\/data\/150583385512136.pid",
+            "pdt": "1505833855",
+            "dt": "1505833870"
+        }
+    ]
+}
+</pre>
+Request:
+<pre class='json_view'>
+{
+	"apikey":"315820",
+	"action":"list",
+	"status":"failed"
+}
+</pre>
+Answer:
+<pre class='json_view'>
+{
+    "status": "ok",
+    "rows": [
+        {
+            "id": "150583385512136",
+            "tasktype": "default",
+            "taskprice": 55,
+            "description": "One more task",
+            "json": "{\n    \"cmd\": \"ls -la\",\n    \"description\": \"One more task\",\n    \"tasktype\": \"default\",\n    \"taskprice\": 55,\n    \"id\": 150583385512136,\n    \"outfile\": \"\\\/var\\\/www\\\/html\\\/screenshot.unixpin.com\\\/image2video\\\/queue\\\/data\\\/20170919\\\/log\\\/150583385512136.out\",\n    \"errfile\": \"\\\/var\\\/www\\\/html\\\/screenshot.unixpin.com\\\/image2video\\\/queue\\\/data\\\/20170919\\\/log\\\/150583385512136.err\",\n    \"pid\": \"\\\/var\\\/www\\\/html\\\/screenshot.unixpin.com\\\/image2video\\\/queue\\\/data\\\/150583385512136.pid\"\n}",
+            "cmd": "ls -la",
+            "status": "failed",
+            "outfile": "\/var\/www\/html\/screenshot.unixpin.com\/image2video\/queue\/data\/20170919\/log\/150583385512136.out",
+            "errfile": "\/var\/www\/html\/screenshot.unixpin.com\/image2video\/queue\/data\/20170919\/log\/150583385512136.err",
+            "pid": "\/var\/www\/html\/screenshot.unixpin.com\/image2video\/queue\/data\/150583385512136.pid",
+            "pdt": "1505833855",
+            "dt": "1505833870"
+        },
+        {
+            "id": "150582816111870",
+            "tasktype": "default",
+            "taskprice": 55,
+            "description": "One more task",
+            "json": "{\n    \"cmd\": \"\\\/bin\\\/false\",\n    \"description\": \"One more task\",\n    \"tasktype\": \"default\",\n    \"taskprice\": 55,\n    \"id\": 150582816111870,\n    \"outfile\": \"\\\/var\\\/www\\\/html\\\/screenshot.unixpin.com\\\/image2video\\\/queue\\\/20170919\\\/log\\\/150582816111870.out\",\n    \"errfile\": \"\\\/var\\\/www\\\/html\\\/screenshot.unixpin.com\\\/image2video\\\/queue\\\/20170919\\\/log\\\/150582816111870.err\",\n    \"pid\": \"\\\/var\\\/www\\\/html\\\/screenshot.unixpin.com\\\/image2video\\\/queue\\\/data\\\/150582816111870.pid\"\n}",
+            "cmd": "\/bin\/false",
+            "status": "failed",
+            "outfile": "\/var\/www\/html\/screenshot.unixpin.com\/image2video\/queue\/20170919\/log\/150582816111870.out",
+            "errfile": "\/var\/www\/html\/screenshot.unixpin.com\/image2video\/queue\/20170919\/log\/150582816111870.err",
+            "pid": "\/var\/www\/html\/screenshot.unixpin.com\/image2video\/queue\/data\/150582816111870.pid",
+            "pdt": "1505828161",
+            "dt": "1505828166"
+        }
+}		
+</pre>
+
+<hr>
+<h3>count</h3>
+Return the count of tasks <br>
+Required parameters:<br>
+<ul>
+<li>"apikey":"315820"</li>
+<li>"action":"count"</li>
+</ul>
+Optional parameters:<br>
+<ul>
+<li>"status":"failed" - select only records with this status </li>
+</ul>
+
+Request:
+<pre class='json_view'>
+{
+	"apikey":"315820",
+	"action":"count"
+}
+</pre>
+Answer:
+
+<pre class='json_view'>
+{
+    "status": "ok",
+    "count": 13
+}
+</pre>
+
+
+
+<hr>
+<h3>add_task</h3>
+Add new task<br>
+Required parameters:<br>
+<ul>
+<li>"apikey":"315820"</li>
+<li>"action":"add_task"</li>
+<li>"cmd":"/bin/true"</li>
+
+</ul>
+Optional parameters:<br>
+<ul>
+<li>"description":"About this task"</li>
+<li>"tasktype":"ffmpeg_processing" - group of tasks. Default - 'default'</li>
+<li>"taskprice":"55" - this parameter define the slots required for start this task ( free slots=100 ). Default = 55. It mean, we can start one task at one time </li>
+</ul>
+Samples:
+
+Request:
+<pre class='json_view'>
+{
+	"apikey":"315820",
+	"action":"add_task",
+	"cmd":"ls -la /"
+}
+</pre>
+Answer:
+<pre class='json_view'>
+{
+    "status": "ok",
+    "id": "150591407816514"
+}
+</pre>
+
+
+<hr>
+<h3>set_status</h3>
+Set new status for tasks<br>
+Required parameters:<br>
+<ul>
+<li>"apikey":"315820"</li>
+<li>"action":"set_status"</li>
+<li>"status":"failed" - new status</li>
+<li>"id":"1234567"</li>
+</ul>
+Optional parameters:<br>
+<ul>
+</ul>
+Samples:
+
+Request:
+<pre class='json_view'>
+{	
+	"apikey":"315820",
+	"action":"set_status",
+	"id":"150583385512136",
+	"status":"paused"
+}
+</pre>
+Answer:
+<pre class='json_view'>
+{
+    "status": "ok"
+}
+</pre>
+
+
+
+</body>
+</html>

@@ -1,0 +1,2 @@
+sudo crontab -u www-data -e
+*  *  *  *  * /usr/bin/php  /var/www/html/screenshot.unixpin.com/image2video/queue/job_starter.php >> /var/www/html/screenshot.unixpin.com/image2video/queue/data/crontab.log 2>&1

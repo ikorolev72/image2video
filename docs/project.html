@@ -1,0 +1,182 @@
+<html>
+<head>
+<title>
+IMAGE2VIDEO. API for projects
+</title>
+</head>
+<body>
+<h2><a href='index.html'>API Docs for project image2html</a> </h2>
+<h3>IMAGE2VIDEO. API for projects</h3>
+All request will be doing with web interface, parameter 'id' with json string, someting like: 
+<pre>http://your_ip/image2video/api/project.php?in={%22action%22:%22set_status%22,%22id%22:%22150583385512136%22,%22status%22:%22paused%22}</pre>
+You can make such request with any browser, wget or curl.
+API answer - json string with field status and additional values, for example:
+<pre class='json_view'> {"status": "ok", "id":"1234567"} </pre> or 
+<pre class='json_view'> {"status": "error","errorno": "4000", "error": "Don't recived input parameters" } </pre>
+
+There are possible next actions: list, count, clone, remove .
+
+<hr>
+<h3>list</h3>
+By default, return list of all projects.<br>
+Required parameters:<br>
+<ul>
+<li>"apikey":"315820"</li>
+<li>"action":"list"</li>
+</ul>
+Optional parameters:<br>
+<ul>
+<li>"id":"1234567" - show info only for project with this id</li>
+</ul>
+Samples:
+
+Request:
+<pre class='json_view'>
+{	
+	"apikey":"315820",
+	"action":"list",
+	"id":"150583385512136"
+}
+</pre>
+Answer:
+<pre class='json_view'>
+{
+    "status": "ok",
+    "rows": [
+        {
+            "project_name": "New project September 18, 2017, 6:39 pm",
+            "project_id": "1505760001d5ea1ebf56c2ee9a7c0973a57a2efaff28b3819e"
+        },
+        {
+            "project_name": "Clone of New project September 7, 2017, 5:14 pm",
+            "project_id": "1505399648dc78d45b38c7490cd65d6933129ed37fa903a00e"
+        }
+    ]
+}
+</pre>
+
+<hr>
+<h3>count</h3>
+Return the count of projects <br>
+Required parameters:<br>
+<ul>
+<li>"apikey":"315820"</li>
+<li>"action":"count"</li>
+</ul>
+Optional parameters:<br>
+<ul>
+
+</ul>
+
+Request:
+<pre class='json_view'>
+{
+	"apikey":"315820",
+	"action":"count"
+}
+</pre>
+Answer:
+
+<pre class='json_view'>
+{
+    "status": "ok",
+    "count": 5
+}
+</pre>
+
+<hr>
+<h3>add</h3>
+Add new project<br>
+Required parameters:<br>
+<ul>
+<li>"apikey":"315820"</li>
+<li>"action":"add"</li>
+<li>"name":"New project"</li>
+
+</ul>
+Optional parameters:<br>
+<ul>
+</ul>
+Samples:
+
+Request:
+<pre class='json_view'>
+{
+	"apikey":"315820",
+	"action":"add",
+	"name":"New project 1"
+}
+</pre>
+Answer:
+<pre class='json_view'>
+{
+    "status": "ok",
+    "id": "150618658947796a88478d28f0ade0534bdb7ac02ebc876961"
+}
+</pre>
+
+<hr>
+<h3>clone</h3>
+Clone existing project<br>
+Required parameters:<br>
+<ul>
+<li>"apikey":"315820"</li>
+<li>"action":"clone"</li>
+<li>"id":"123456576"</li>
+
+</ul>
+Optional parameters:<br>
+<ul>
+<li>"name":"Name for cloned project"</li>
+</ul>
+Samples:
+
+Request:
+<pre class='json_view'>
+{
+	"apikey":"315820",
+	"action":"clone",
+	"name":"New clone of project 1"
+}
+</pre>
+Answer:
+<pre class='json_view'>
+{
+    "status": "ok",
+    "id": "150618673841be33720c67f96493b0757f34357fa759b6ce3e"
+}
+</pre>
+
+
+<hr>
+<h3>remove</h3>
+Remove project<br>
+Required parameters:<br>
+<ul>
+<li>"apikey":"315820"</li>
+<li>"id":"1234567"</li>
+</ul>
+Optional parameters:<br>
+<ul>
+</ul>
+Samples:
+
+Request:
+<pre class='json_view'>
+{	
+	"apikey":"315820",
+	"action":"remove",
+	"id":"150583385512136"
+}
+</pre>
+Answer:
+<pre class='json_view'>
+{
+    "status": "ok"
+}
+</pre>
+
+
+
+</body>
+</html>
