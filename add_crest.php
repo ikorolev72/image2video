@@ -36,6 +36,15 @@ $errors= array();
 $messages= array();
 $effects_info= array();
 
+$string = file_get_contents("$upload_dir/audio.txt");
+$audio = json_decode($string, true);
+
+$string = file_get_contents("$upload_dir/images.txt");
+$images = json_decode($string, true);
+
+$string = file_get_contents("$upload_dir/effects.txt");
+$effects = json_decode($string, true);
+
 $string = file_get_contents("$upload_dir/project.txt");
 $project = json_decode($string, true);
 
@@ -47,33 +56,33 @@ $files_info=array();
 	echo '<h3> Project: '.$project['project_name'].'</h3>';	
 	echo image2video::showMenu( $project_id );
 	
-	
+//	echo "// <a href='upload_to_youtube.php?project_id=$project_id'>Upload to youtube</a> // <a href='add_crest.php?project_id=$project_id'>Crest</a> // <a href='add_crest.php?project_id=$project_id'>crest</a> // <a href='upload_audio.php?project_id=$project_id'>Audio</a> // <a href='add_new_image.php?project_id=$project_id'>Add new image</a> // <a href='change_image_order.php?project_id=$project_id'>Change image order</a> // <a href='delete_image.php?project_id=$project_id'>Remove the image</a> // <a href='edit_effect.php?project_id=$project_id'>Edit effect</a> //<hr><br>";	
+
 $output_width=image2video::$output_width;
-$output_height=image2video::$output_height;
+$output_height=image2video::$output_height;	
 
 if( $crest[1]['url'] ) {
 	$crest_filename=$crest[1]['name'];
 	$crest_url=$crest[1]['url'];
-	$crest_x=$crest[1]['crest_x'];
-	$crest_y=$crest[1]['crest_y'];
+	$x=$crest[1]['x'];
+	$y=$crest[1]['y'];
 	$crest_enable_checked='no_checked';
 
-	$crest_w=$crest[1]['crest_w'];
-	$crest_h=$crest[1]['crest_h'];
+	$w=$crest[1]['w'];
+	$h=$crest[1]['h'];
 
 
-	if( $crest[1]['crest_enable'] ) {
+	if( $crest[1]['enable'] ) {
 		$crest_enable_checked='checked';
 	}
 }
 else {	
-	$crest_x=20;
-	$crest_y=0;	
+	$x=20;
+	$y=0;	
 	$crest_enable_checked='checked';
-	$crest_w=200;
-	$crest_h=200;	
+	$w=200;
+	$h=200;	
 }
-
 
 
 
@@ -93,17 +102,25 @@ $form="
 		
 $form.="
         <tr><td>Add/change crest</td><td><input type='file' name='img[]' multiple> </td></tr>
-        <tr><td>X</td><td><input type='number'  name='crest_x' value='$crest_x' min='0' max='$output_width' > </td></tr>
-        <tr><td>Y</td><td><input type='number'  name='crest_y' value='$crest_y' min='0' max='$output_height' > </td></tr>
-        <tr><td>Resize to width</td><td><input type='number'  name='crest_w' value='$crest_w' min='0' max='$output_width' > </td></tr>
-        <tr><td>Resize to height</td><td><input type='number'  name='crest_h' value='$crest_h' min='0' max='$output_height' > </td></tr>
-        <tr><td>Enable crest</td><td><input type='checkbox'  name='crest_enable' value='1' $crest_enable_checked > </td></tr>
+        <tr><td>X</td><td><input type='number'  name='x' value='$x' min='0' max='$output_width' > </td></tr>
+        <tr><td>Y</td><td><input type='number'  name='y' value='$y' min='0' max='$output_height' > </td></tr>
+        <tr><td>Resize to width</td><td><input type='number'  name='w' value='$w' min='0' max='$output_width' > </td></tr>
+        <tr><td>Resize to height</td><td><input type='number'  name='h' value='$h' min='0' max='$output_height' > </td></tr>
+        <tr><td>Enable crest</td><td><input type='checkbox'  name='enable' value='1' $crest_enable_checked > </td></tr>
         <tr><td></td><td><input type='submit' name='save' value='Save'> </td></tr>	
 	<input type='hidden' name='project_id' value='$project_id'>		
 	</table>
 	";
-
-	
+/*
+    </form>
+		<form action='upload_audio.php' method='post' multipart='' enctype='multipart/form-data'>	
+        <tr><td></td>
+					<td>	
+						<input type='hidden' name='project_id' value='$project_id'>	
+						<input type='submit' name='skip_crest' id='skip_crest' value='Skip crest'>
+					</td></tr>
+		</form>				
+*/
 
 
 
@@ -186,44 +203,46 @@ $img_desc = image2video::reArrayFiles($img);
 		);
 
     }
-	if( $_POST['crest_x'] <0 ) 		{
+	if( $_POST['x'] <0 ) 		{
 			$errors[]="crest x and y coordinates must be zero or positive. X and Y set to 0";
-			$_POST['crest_x']=0;
-			$_POST['crest_y']=0;
+			$_POST['x']=0;
+			$_POST['y']=0;
 		}
-	if( ! $_POST['crest_w']  || $_POST['crest_h'] || $_POST['crest_w']>$output_width || $_POST['crest_h']>$output_height ) 	
+	if( ! $_POST['w']  || $_POST['h'] || $_POST['w']>$output_width || $_POST['h']>$output_height ) 	
 		{
 			$errors[]="crest width and height set to 200";
-			$_POST['crest_w']=200;
-			$_POST['crest_h']=200;
+			$_POST['w']=200;
+			$_POST['h']=200;
 		}
-
-	$files_info[$k]['crest_x']=intval( $_POST['crest_x'] );
-	$files_info[$k]['crest_y']=intval( $_POST['crest_y'] );
-	$files_info[$k]['crest_w']=intval( $_POST['crest_w'] );
-	$files_info[$k]['crest_h']=intval( $_POST['crest_h'] );
-	$files_info[$k]['crest_enable']=$_POST['crest_enable'];
+		
+	$files_info[$k]['x']=intval( $_POST['x'] );
+	$files_info[$k]['y']=intval( $_POST['y'] );
+	$files_info[$k]['w']=intval( $_POST['w'] );
+	$files_info[$k]['h']=intval( $_POST['h'] );
+	$files_info[$k]['enable']=$_POST['enable'];
 	
 } else {
 
 	$files_info=&$crest;
 	$k=1;
-	if( $_POST['crest_x'] <0 ) 		{
+	if( $_POST['x'] <0 ) 		{
 			$errors[]="crest x and y coordinates must be zero or positive. X and Y set to 0";
-			$_POST['crest_x']=0;
-			$_POST['crest_y']=0;
+			$_POST['x']=0;
+			$_POST['y']=0;
 		}
-	if( !$_POST['crest_w']  || !$_POST['crest_h'] || $_POST['crest_w']>$output_width || $_POST['crest_h']>$output_height ) 	
+	if( !$_POST['w']  || !$_POST['h'] || $_POST['w']>$output_width || $_POST['h']>$output_height ) 	
 		{
 			$errors[]="crest width and height set to 200";
-			$_POST['crest_w']=200;
-			$_POST['crest_h']=200;
+			$_POST['w']=200;
+			$_POST['h']=200;
 		}
-	$files_info[$k]['crest_x']=intval( $_POST['crest_x'] );
-	$files_info[$k]['crest_y']=intval( $_POST['crest_y'] );
-	$files_info[$k]['crest_w']=intval( $_POST['crest_w'] );
-	$files_info[$k]['crest_h']=intval( $_POST['crest_h'] );
-	$files_info[$k]['crest_enable']=$_POST['crest_enable'];
+	$files_info[$k]['x']=intval( $_POST['x'] );
+	$files_info[$k]['y']=intval( $_POST['y'] );
+	$files_info[$k]['w']=intval( $_POST['w'] );
+	$files_info[$k]['h']=intval( $_POST['h'] );
+	#$files_info[$k]['x']=$_POST['x'];
+	#$files_info[$k]['y']=$_POST['y'];
+	$files_info[$k]['enable']=$_POST['enable'];
 }	
 
 
@@ -246,7 +265,7 @@ $img_desc = image2video::reArrayFiles($img);
 		
 	if ( $k>0 ){
 		$form="
-    <form action='add_logo.php' method='post' multipart='' enctype='multipart/form-data'>	
+    <form action='upload_audio.php' method='post' multipart='' enctype='multipart/form-data'>	
 	<table>		
         <tr><td></td><td><input type='submit' value='Next step'> </td></tr>
 	</table>

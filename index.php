@@ -54,6 +54,7 @@ if( $_POST['add'] ) {
 	$project_name=$_POST['project_name'];
 	$project['project_name']=$project_name;
 	$project['project_id']=$project_id;
+	$project['main_upload_dir']=$main_upload_dir;
 	
 	if( ! mkdir( "$main_upload_dir/$project_id", 0777, true) ) 
 	{

@@ -54,37 +54,41 @@ $files_info=array();
 	echo image2video::showMenu( $project_id );
 
 
-if( ! $audio['name'] ) {
-	$audio[1]['audio_enable']=1;
-	$audio[1]['audio_rnd']=1;
+if( ! $audio[1]['name'] ) {
+	$audio[1]['enable']=1;
+	$audio[1]['rnd']=1;
 }
 
 	
-$audio_enable_checked='';
-$audio_rnd_checked='';
+$enable_checked='';
+$rnd_checked='';
 
-$audio_enable=$audio[1]['audio_enable'];
-$audio_rnd=$audio[1]['audio_rnd'];
+$enable=$audio[1]['enable'];
+$rnd=$audio[1]['rnd'];
 
-if( $audio_enable ) {
-	$audio_enable_checked='checked';
+if( $enable ) {
+	$enable_checked='checked';
 }
-if( $audio_rnd ) {
-	$audio_rnd_checked='checked' ;
+if( $rnd ) {
+	$rnd_checked='checked' ;
 }
 
+echo "<pre>";
+echo var_dump($rnd);
+echo var_dump($enable);
+echo "</pre>";
 
 
 
 
 
 
-if( $_GET['del'] && $_GET['audio_id'] && $_GET['project_id'] ) {
+if( $_GET['del'] && $_GET['item_id'] && $_GET['project_id'] ) {
 	$audio_new=$audio;
-	$audio_id=$_GET['audio_id'];
-	unset( $audio[ $audio_id ] );
-	$audio[1]['audio_rnd']= $audio_rnd;
-	$audio[1]['audio_enable']=$audio_enable;
+	$item_id=$_GET['item_id'];
+	unset( $audio[ $item_id ] );
+	$audio[1]['rnd']= $rnd;
+	$audio[1]['enable']=$enable;
 }
 /*
 echo '<pre>';
@@ -102,17 +106,18 @@ foreach($audio as $k=>$val):
         if( $audio[$k]['url'] ) {
 			$audio_filename=$audio[$k]['name'];
 			$audio_url=$audio[$k]['url'];
-			$audio_selected_checked='';
-			if( $audio[$k]['audio_selected'] ) {				
-				$audio_selected_checked="checked";				
+			$item_selected_checked='';
+			if( $audio[1]['item_selected']==$k ) {				
+				$item_selected_checked="checked";				
 			}
+
 			$form.="
 			<tr>
 				<td>Use this audio track</td>
-				<td><input type='radio'  name='audio_selected' value=$k $audio_selected_checked > </td>
+				<td><input type='radio'  name='item_selected' value=$k $item_selected_checked > </td>
 				<td><a href='$audio_url'> Audio $k </a></td>
 				<td>Change audio file</td><td><input type='file' name='audioform[]' multiple> </td>
-				<td>[ <a href='' onclick=\"confirm_prompt( 'Are you sure to remove this audio file?','?del=1&audio_id=$k&project_id=$project_id'); return false;\">Remove this audio</a> ] </td>
+				<td>[ <a href='' onclick=\"confirm_prompt( 'Are you sure to remove this audio file?','?del=1&item_id=$k&project_id=$project_id'); return false;\">Remove this audio</a> ] </td>
 			</tr>
 			";
 		}
@@ -126,8 +131,8 @@ $form.="
 				<td>Add audio file</td><td><input type='file' name='audioform[]' multiple> </td>
 				<td></td>
 			</tr>
-			<tr><td>Use randomize audio track</td><td><input type='checkbox'  name='audio_rnd' value='1' $audio_rnd_checked > </td><td></td><td></td></tr>
-			<tr><td>Enable audio</td><td><input type='checkbox'  name='audio_enable' value='1' $audio_enable_checked > </td><td></td><td></td></tr>
+			<tr><td>Use randomize audio track</td><td><input type='checkbox'  name='rnd' value='1' $rnd_checked > </td><td></td><td></td></tr>
+			<tr><td>Enable audio</td><td><input type='checkbox'  name='enable' value='1' $enable_checked > </td><td></td><td></td></tr>
 			<tr>
 				<td><input type='submit' name='save' id='save' value='Save file'></form></td>
 
@@ -148,7 +153,7 @@ $audio_desc = image2video::reArrayFiles($audioform);
     foreach($audio_desc as $val)
     {
 		$k++;
-		$files_info[$k]['audio_selected']=0;
+		#$files_info[$k]['item_selected']=0;
 		if( empty($val['name'])) 
 		{
 			continue;
@@ -195,13 +200,13 @@ $audio_desc = image2video::reArrayFiles($audioform);
 
     }
 	if( $_POST['save'] ) {	
-		$files_info[1]['audio_enable']=$_POST['audio_enable'];	
-		$files_info[1]['audio_rnd']=$_POST['audio_rnd'];	
-		$audio_selected=$_POST['audio_selected'];
-		if( $audio_selected ) {
-			$files_info[ $audio_selected ]['audio_selected']=1;
-		}
-		$files_info[1]['audio_rnd']=$_POST['audio_rnd'];		
+		$files_info[1]['enable']=$_POST['enable'];	
+		$files_info[1]['rnd']=$_POST['rnd'];	
+		$item_selected=$_POST['item_selected'];
+		if( $item_selected ) {
+			$files_info[1]['item_selected']=$item_selected;	
+			#$files_info[ $item_selected ]['item_selected']=1;
+		}	
 	}
 } 
 
@@ -212,7 +217,7 @@ $audio_desc = image2video::reArrayFiles($audioform);
 		{
 			$errors[]="Unable to open file $upload_dir/audio.txt";
 		}
-	fwrite($myfile, json_encode ( $files_info ) );
+	fwrite($myfile, json_encode ( $files_info, JSON_PRETTY_PRINT ) );
 	fclose($myfile);
 	
 	foreach($messages as $value)

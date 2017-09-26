@@ -1,0 +1,209 @@
+<html>
+<head>
+<title>
+IMAGE2VIDEO. API for crest
+</title>
+	<LINK href='main.css' type=text/css rel=stylesheet>
+</head>
+<body>
+<h2><a href='index.html'>API Docs for project image2html</a> </h2>
+<h3>IMAGE2VIDEO. API for crest</h3>
+
+You can make request with any browser, wget or curl.
+<pre class='curl_view'>curl -i -X POST -F in='{ "apikey":"315820", "action":"list", "project_id": "150618673841be33720c67f96493b0757f34357fa759b6ce3e"}' http://your_ip/image2video/api/crest.php</pre>
+<pre class='curl_view'>curl -i -X POST  -H "Content-Type: multipart/form-data" -F 'in=@/tmp/crest.json' http://your_ip/image2video/api/crest.php</pre>
+ 
+API answer - json string with field status and additional values, for example:
+<pre class='json_view'> 
+{
+	"status": "ok", 
+	"count":"12"
+} 
+</pre> 
+or 
+<pre class='json_view'> 
+{
+	"status": "error",
+	"errorno": "4000", 
+	"error": "Don't recived input parameters" 
+	} 
+</pre>
+
+There are possible next actions: list, add, set .
+
+<hr>
+<h3>list</h3>
+By default, return crest properties.<br>
+Required parameters:<br>
+<ul>
+<li>"apikey":"315820"</li>
+<li>"action":"list"</li>
+<li>"project_id":"1234567"</li>
+</ul>
+Optional parameters:<br>
+<ul>
+</ul>
+Samples:
+
+Request:
+<pre class='json_view'>
+{	
+	"apikey":"315820",
+	"action":"list",
+	"project_id":"150583385512136"
+}
+</pre>
+Answer:
+<pre class='json_view'>
+{
+    "rows": {
+        "1": {
+            "enable": 0,
+            "x": 100,
+            "y": 100,
+            "w": 200,
+            "h": 200,
+            "url": ".\/uploads\/150618673841be33720c67f96493b0757f34357fa759b6ce3e\/31ccdccb9db8cbdf8564ae85065e947480fcab52.jpg",
+            "name": "\/var\/www\/html\/screenshot.unixpin.com\/image2video\/uploads\/150618673841be33720c67f96493b0757f34357fa759b6ce3e\/31ccdccb9db8cbdf8564ae85065e947480fcab52.jpg",
+            "ext": "jpg",
+            "size": 12398,
+            "type": "image\/jpeg",
+            "width": 250,
+            "height": 125,
+            "thumb_name": "\/var\/www\/html\/screenshot.unixpin.com\/image2video\/uploads\/150618673841be33720c67f96493b0757f34357fa759b6ce3e\/thumb_31ccdccb9db8cbdf8564ae85065e947480fcab52.jpg",
+            "thumb_url": ".\/uploads\/150618673841be33720c67f96493b0757f34357fa759b6ce3e\/thumb_31ccdccb9db8cbdf8564ae85065e947480fcab52.jpg",
+            "thumb_w": 200,
+            "thumb_h": 100
+        }
+    },
+    "status": "ok"
+}
+</pre>
+
+
+<hr>
+<h3>set</h3>
+Set crest properties<br>
+Required parameters:<br>
+<ul>
+<li>"apikey":"315820"</li>
+<li>"action":"set"</li>
+<li>"project_id":"1234567"</li>
+</ul>
+Optional parameters:<br>
+<ul>
+<li>"x":0</li>
+<li>"y":0</li>
+<li>"w":200</li>
+<li>"h":200</li>
+<li>"enable":1</li>
+</ul>
+
+
+Samples:
+
+Request:
+<pre class='json_view'>
+{	
+	"apikey":"31520",
+	"action":"set",
+	"project_id": "150618673841be33720c67f96493b0757f34357fa759b6ce3e",
+	"enable":0,
+	"x":100,
+	"y":100
+}
+</pre>
+Answer:
+<pre class='json_view'>
+{
+    "rows": {
+        "1": {
+            "enable": 0,
+            "x": 100,
+            "y": 100,
+            "w": 200,
+            "h": 200,
+            "url": ".\/uploads\/150618673841be33720c67f96493b0757f34357fa759b6ce3e\/31ccdccb9db8cbdf8564ae85065e947480fcab52.jpg",
+            "name": "\/var\/www\/html\/screenshot.unixpin.com\/image2video\/uploads\/150618673841be33720c67f96493b0757f34357fa759b6ce3e\/31ccdccb9db8cbdf8564ae85065e947480fcab52.jpg",
+            "ext": "jpg",
+            "size": 12398,
+            "type": "image\/jpeg",
+            "width": 250,
+            "height": 125,
+            "thumb_name": "\/var\/www\/html\/screenshot.unixpin.com\/image2video\/uploads\/150618673841be33720c67f96493b0757f34357fa759b6ce3e\/thumb_31ccdccb9db8cbdf8564ae85065e947480fcab52.jpg",
+            "thumb_url": ".\/uploads\/150618673841be33720c67f96493b0757f34357fa759b6ce3e\/thumb_31ccdccb9db8cbdf8564ae85065e947480fcab52.jpg",
+            "thumb_w": 200,
+            "thumb_h": 100
+        }
+    },
+    "status": "ok"
+}
+</pre>
+
+
+
+
+<hr>
+<h3>add</h3>
+Add new ( or replace existing ) crest<br>
+Required parameters:<br>
+<ul>
+<li>"apikey":"315820"</li>
+<li>"action":"add"</li>
+<li>"project_id":"1234567"</li>
+
+</ul>
+Optional parameters:<br>
+<ul>
+<li><s>"image_base64":"/9j/4AAQSkZJRgABAQEAYABgAAD//gA7Q1JFQVRPUjogZ2QtanBlZyB2MS4wIC..."</s></li>
+<li>"image_copy":"\/home\/user\/images\/gifts.jpg"</li>
+<li>"image_url":"http:\/\/example.com\/static\/images\/gifts.jpg"</li>
+<li>"x":20</li>
+<li>"y":0</li>
+<li>"w":200</li>
+<li>"h":200</li>
+<li>"enable":1</li>
+</ul>
+Samples:
+
+Request:
+<pre class='json_view'>
+{
+	"apikey":"315820",
+	"action":"add",
+	"image_url":"http:\/\/example.com\/static\/images\/gifts.jpg",
+	"y": 50,
+	"x": 50
+}
+</pre>
+Answer:
+<pre class='json_view'>
+{
+    "status": "ok",
+    "rows": {
+        "1": {
+            "enable": "1",
+            "x": 50,
+            "y": 50,
+            "w": 200,
+            "h": 200,
+            "url": ".\/uploads\/150618673841be33720c67f96493b0757f34357fa759b6ce3e\/31ccdccb9db8cbdf8564ae85065e947480fcab52.jpg",
+            "name": "\/var\/www\/html\/screenshot.unixpin.com\/image2video\/uploads\/150618673841be33720c67f96493b0757f34357fa759b6ce3e\/31ccdccb9db8cbdf8564ae85065e947480fcab52.jpg",
+            "ext": "jpg",
+            "size": 12398,
+            "type": "image\/jpeg",
+            "width": 250,
+            "height": 125,
+            "thumb_name": "\/var\/www\/html\/screenshot.unixpin.com\/image2video\/uploads\/150618673841be33720c67f96493b0757f34357fa759b6ce3e\/thumb_31ccdccb9db8cbdf8564ae85065e947480fcab52.jpg",
+            "thumb_url": ".\/uploads\/150618673841be33720c67f96493b0757f34357fa759b6ce3e\/thumb_31ccdccb9db8cbdf8564ae85065e947480fcab52.jpg",
+            "thumb_w": 200,
+            "thumb_h": 100
+        }
+    }
+}
+</pre>
+
+
+
+</body>
+</html>

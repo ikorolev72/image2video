@@ -52,8 +52,8 @@ if( !commonapi::check_apikey( $in['apikey'] )) {
 if( $in['action'] == 'list' ){
 	# action list for record with id
 	
-	if( array_key_exists( 'id', $in ) ) {
-		$dir=$in['id'];
+	if( array_key_exists( 'project_id', $in ) ) {
+		$dir=$in['project_id'];
 		if( file_exists( "$main_upload_dir/$dir/project.txt") ) {
 			$out['status']='ok';
 			$out['rows']=array( );			
@@ -64,11 +64,11 @@ if( $in['action'] == 'list' ){
 		} else {
 			$out['status']='error';
 			$out['errorno']='4100';
-			$out['error']="Cannot get the project with id=".$in['id'];
+			$out['error']="Cannot get the project with project_id=".$in['project_id'];
 			print_json_and_exit( $out );				
 		}
 	}
-	# action list for records without id
+	# action list for records without project_id
 	else {
 		$out['status']='ok';
 		$out['rows']=array( );
@@ -85,8 +85,7 @@ if( $in['action'] == 'list' ){
 }
 
 # action 'add' new project
-if( $in['action'] == 'add' ){
-	# action clone for record with id	
+if( $in['action'] == 'add' ){	
 	if( array_key_exists( 'name', $in ) ) 
 	{
 		$project_name=isset( $in['name'] )? $in['name'] : "New project $dt";
@@ -113,7 +112,7 @@ if( $in['action'] == 'add' ){
 		}
 		
 		$out['status']='ok';
-		$out['id']=$project_id;
+		$out['project_id']=$project_id;
 		print_json_and_exit( $out );	
 	}
 	else 
@@ -128,17 +127,17 @@ if( $in['action'] == 'add' ){
 
 # action clone
 if( $in['action'] == 'clone' ){
-	# action clone for record with id	
-	if( array_key_exists( 'id', $in ) ) 
+	# action clone for record with project_id	
+	if( array_key_exists( 'project_id', $in ) ) 
 	{
-		$old_project_id=$in['id'];
+		$old_project_id=$in['project_id'];
 		if( !file_exists( "$main_upload_dir/$old_project_id/project.txt")) {
 			$out['status']='error';
 			$out['errorno']='4100';
-			$out['error']="Cannot get the project with id=".$in['id'];
+			$out['error']="Cannot get the project with project_id=".$in['project_id'];
 			print_json_and_exit( $out );
 		}
-		$project_name=isset( $in['name'] )? $in['name'] : "Clone of project with id $old_project_id";
+		$project_name=isset( $in['name'] )? $in['name'] : "Clone of project with project_id $old_project_id";
 		$upload_dir="$main_upload_dir/$old_project_id";		
 		$project=array();
 		$project_id=$dt.sha1( $project_name.$today );
@@ -183,7 +182,7 @@ if( $in['action'] == 'clone' ){
 			}							
 		}
 		$out['status']='ok';
-		$out['id']=$project_id;
+		$out['project_id']=$project_id;
 		print_json_and_exit( $out );	
 	}
 	else 
@@ -198,10 +197,10 @@ if( $in['action'] == 'clone' ){
 
 # action remove
 if( $in['action'] == 'remove' ){
-	# action remove for record with id	
-	if( array_key_exists( 'id', $in ) ) 
+	# action remove for record with project_id	
+	if( array_key_exists( 'project_id', $in ) ) 
 	{
-		$project_id=$in['id'];
+		$project_id=$in['project_id'];
 		if( file_exists( "$main_upload_dir/$project_id/project.txt") ) {
 			exec( "rm -rf $main_upload_dir/$project_id" );
 			$out['status']='ok';		
@@ -209,7 +208,7 @@ if( $in['action'] == 'remove' ){
 		} else{
 			$out['status']='error';
 			$out['errorno']='4104';
-			$out['error']="Project with id '$project_id' do not exists";
+			$out['error']="Project with project_id '$project_id' do not exists";
 			print_json_and_exit( $out );		
 		}
 	}
@@ -217,7 +216,7 @@ if( $in['action'] == 'remove' ){
 	{
 		$out['status']='error';
 		$out['errorno']='4003';
-		$out['error']="Did not receive required input parameter 'id'";
+		$out['error']="Did not receive required input parameter 'project_id'";
 		print_json_and_exit( $out );	
 	}
 }
@@ -245,13 +244,6 @@ print_json_and_exit( $out );
 
 
 
-function get_param( $val ) {
-	global $_POST;
-	global $_GET;
-	$ret=isset( $_POST[ $val ] ) ? $_POST[ $val ] : 
-				( isset( $_GET[ $val ] ) ? $_GET[ $val ] : null );
-	return $ret;
-}
 
 function print_json_and_exit( $out ) {
 	echo json_encode( $out, JSON_PRETTY_PRINT );

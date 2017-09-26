@@ -14,7 +14,9 @@ $head="<!doctype html>
 <hr>
 
 	";
-if( !$_POST['project_id'] && !$_GET['project_id']  ) {
+
+$project_id=image2video::get_param('project_id');	
+if( !$project_id ) {
 	echo $head;
 	echo "<h3> Error !Cannot found project name </h3>";
 	echo "Try again <a href=index.php> here </a>
@@ -24,8 +26,7 @@ if( !$_POST['project_id'] && !$_GET['project_id']  ) {
 	exit(0);
 }
 
-$project_id=$_POST['project_id'];
-if( !$project_id ) $project_id=$_GET['project_id'];
+
 $basedir=dirname(__FILE__);
 $main_upload_dir="$basedir/uploads/";
 $upload_dir="$basedir/uploads/$project_id";
@@ -78,9 +79,26 @@ if( ! $fonts_array ) {
 
 	if( $_POST['make_video'] ) 
 	{
-		$command="/bin/bash $upload_dir/make_slideshow.sh >> /$upload_dir/make_slideshow.log 2>&1 &";
-		exec ( $command );
-		sleep(3);
+		if( image2video::$queue4job_use ) {
+			$command="/bin/bash $upload_dir/make_slideshow.sh";
+			$add_task_to_queue="php ".image2video::$queue4job_path."/add_task.php -c '$command' -t 'ffmpeg_processing' -d 'Task for ".addslashes($project['project_name'])."' -p 55" ;
+			exec ( $add_task_to_queue, $task_id, $return_value );
+			if( $return_value==0 ) {				
+				if( file_exists( "$upload_dir/make_slideshow_report.htm") ){
+					file_put_contents( "$upload_dir/make_slideshow_report.htm" , "Added new task for processing this project ".$project['project_name']."\nPlease wait...\n", FILE_APPEND ) ;				
+				} else{
+					file_put_contents( "$upload_dir/make_slideshow_report.htm" , "<html><head><meta http-equiv=refresh content=10 ></head>
+											<body><a href=../../index.php> [ Home ] </a><hr><pre>
+											Added new <a href='queue_list.php?id=$task_id'> task $id </a> for processing this project ".$project['project_name']."\nPlease wait...\n" ) ;
+				}
+			}
+	
+		} else {
+			$command="/bin/bash $upload_dir/make_slideshow.sh >> /$upload_dir/make_slideshow.log 2>&1 &";
+			exec ( $command );
+			sleep(3);			
+		}
+
 		header("Location: $upload_url/make_slideshow_report.html"); 
 		exit;		
 	}
@@ -423,38 +441,39 @@ global $output_width;
 global $output_height;
 
 $audio_file=$audio[1][name];
-$audio_enable=$audio[1]['audio_enable'];
+$audio_enable=$audio[1]['enable'];
 $audio_names=array();
 
 
 
 
-if( $audio[1]['audio_rnd'] ) {
+if( $audio[1]['rnd'] ) {
 	$audio_file=$audio[ array_rand ( $audio ) ]['name'] ;
 } 
-else {
-	foreach($audio as $k=>$val) {
-		if( $val['audio_selected'] ) {
-			$audio_file=$val['name'];
+else {	
+	if( isset( $audio[1]['item_selected'] )) {
+		$audio_item_selected=$audio[1]['item_selected'];
+		if( file_exists( $audio[ $audio_item_selected  ]['name'] ) ) {
+			$audio_file=$audio[ $audio_item_selected ]['name'] ;
 		}
-	}
+	} 
 }
 
 
 
-$logo_file=$logo[1][name];
-$logo_x=$logo[1][logo_x];
-$logo_y=$logo[1][logo_y];
-$logo_w=$logo[1][logo_w];
-$logo_h=$logo[1][logo_h];
-$logo_enable=$logo[1][logo_enable];
+$logo_file=$logo[1]['name'];
+$logo_x=$logo[1]['x'];
+$logo_y=$logo[1]['y'];
+$logo_w=$logo[1]['w'];
+$logo_h=$logo[1]['h'];
+$logo_enable=$logo[1]['enable'];
 
-$crest_file=$crest[1][name];
-$crest_x=$crest[1][crest_x];
-$crest_y=$crest[1][crest_y];
-$crest_w=$crest[1][crest_w];
-$crest_h=$crest[1][crest_h];
-$crest_enable=$crest[1][crest_enable];
+$crest_file=$crest[1]['name'];
+$crest_x=$crest[1]['x'];
+$crest_y=$crest[1]['y'];
+$crest_w=$crest[1]['w'];
+$crest_h=$crest[1]['h'];
+$crest_enable=$crest[1]['enable'];
 
 #$effects[$k]['disable_crest_for_last_image']
 

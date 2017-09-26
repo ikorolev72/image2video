@@ -24,7 +24,7 @@ var_dump( $_FILES );
 */
 
 $json_in=commonapi::get_param( 'in' );
-$item_name='logo';
+$item_name='audio';
 
 if( !$json_in ) {
 	$out['status']='error';
@@ -97,28 +97,18 @@ if( $in['action'] == 'set' ){
 		$out['errorno']='4110';
 		$out['error']="$item_name for project with project_id ".$in['project_id']." do not exist ";
 		print_json_and_exit( $out );				
-	}		
+	}
 	$string = file_get_contents( $item_file );
 	$item = json_decode($string, true);
-	if( array_key_exists( 'enable', $in )  ) {
-		$item[1]["enable"]=$in['enable'];
+	if( array_key_exists( 'disable', $in ) || ( array_key_exists( 'enable', $in ) && !$in['enable'] ) ) {
+		$item[1]["enable"]=0;
 	}
-	if( array_key_exists( 'x', $in ) )  {
-		$v=intval( $in['x'] );
-		$item[1]["x"]=(  $v>0 && $v<image2video::$output_width ) ? $v : 0 ;
-	}
-	if( array_key_exists( 'y', $in ) )  {
-		$v=intval( $in['y'] );
-		$item[1]["y"]=(  $v>0 && $v<image2video::$output_height ) ? $v : 0 ;
-	}
-	if( array_key_exists( 'w', $in ) )  {
-		$v=intval( $in['w'] );
-		$item[1]["w"]=(  $v>0 && $v<image2video::$output_width ) ? $v : 200 ;
-	}
-	if( array_key_exists( 'h', $in ) )  {
-		$v=intval( $in['h'] );
-		$item[1]["h"]=(  $v>0 && $v<image2video::$output_height ) ? $v : 200 ;
-	}		
+	if( array_key_exists( 'rnd', $in ) && !$in['rnd']  ) {
+		$item[1]["rnd"]=0;
+	}	
+	if( array_key_exists( 'item_selected', $in ) ) {
+		$item[1]["item_selected"]=intval( $in['item_selected'] );
+	}	
 
 	$filename= $item_file;
 	$string=json_encode( $item, JSON_PRETTY_PRINT );			
@@ -134,7 +124,7 @@ if( $in['action'] == 'set' ){
 
 }
 
-# action 'add' new logo
+# action 'add' new audio
 if( $in['action'] == 'add' ){	
 	$err=null;
 	$upload_dir="$main_upload_dir/$project_id";
@@ -144,67 +134,60 @@ if( $in['action'] == 'add' ){
 		$item = json_decode($string, true);		
 	} else {
 		$item = array();
-		$item[1]["enable"]="1";
-		$item[1]["x"]=image2video::$output_width-200+20 ;
-		$item[1]["y"]=0 ;
-		$item[1]["w"]=200 ;
-		$item[1]["h"]=200 ;
+		$item[1]["enable"]=1;
+		$item[1]["rnd"]=1;
+		$item[1]["item_selected"]=1;
 	}
 	if( array_key_exists( 'disable', $in ) || ( array_key_exists( 'enable', $in ) && !$in['enable'] ) ) {
-		$item[1]["enable"]="0";
+		$item[1]["enable"]=0;
 	}
-	if( array_key_exists( 'x', $in ) )  {
-		$v=intval( $in['x'] );
-		$item[1]["x"]=(  $v>0 && $v<image2video::$output_width ) ? $v : image2video::$output_width-200+20 ;
+	if( array_key_exists( 'rnd', $in ) && !$in['rnd']  ) {
+		$item[1]["rnd"]=0;
 	}
-	if( array_key_exists( 'y', $in ) )  {
-		$v=intval( $in['y'] );
-		$item[1]["y"]=(  $v>0 && $v<image2video::$output_height ) ? $v : 0 ;
+	if( array_key_exists( 'item_selected', $in ) ) {
+		$item[1]["item_selected"]=intval( $in['item_selected'] );
 	}
-	if( array_key_exists( 'w', $in ) )  {
-		$v=intval( $in['w'] );
-		$item[1]["w"]=(  $v>0 && $v<image2video::$output_width ) ? $v : 200 ;
-	}
-	if( array_key_exists( 'h', $in ) )  {
-		$v=intval( $in['h'] );
-		$item[1]["h"]=(  $v>0 && $v<image2video::$output_height ) ? $v : 200 ;
-	}
-		
-	if( array_key_exists( 'image_base64', $in ) ) {
-		$new_image_item=image2video::save_image_base64 ( $in['image_base64'], $upload_dir, $upload_url, $err )	;
-		if( ! $new_image_item ) {
+	
+	if( array_key_exists( 'audio_base64', $in ) ) {
+		$new_audio_item=image2video::save_audio_base64 ( $in['audio_base64'], $upload_dir, $upload_url, $err )	;
+		if( ! $new_audio_item ) {
 			$out['status']='error';
-			$out['errorno']='4111';
-			$out['error']="Error while try save image: $err";
+			$out['errorno']='4121';
+			$out['error']="Error while try save audio: $err";
 			print_json_and_exit( $out );				
 		}
 	}
-	if( array_key_exists( 'image_copy', $in ) ) {
-		$new_image_item=image2video::save_image_copy ( $in['image_copy'], $upload_dir, $upload_url, $err )	;
-		if( ! $new_image_item ) {
+	if( array_key_exists( 'audio_copy', $in ) ) {
+		$new_audio_item=image2video::save_audio_copy ( $in['audio_copy'], $upload_dir, $upload_url, $err )	;
+		if( ! $new_audio_item ) {
 			$out['status']='error';
-			$out['errorno']='4111';
-			$out['error']="Error while try save image: $err";
+			$out['errorno']='4121';
+			$out['error']="Error while try save audio: $err";
 			print_json_and_exit( $out );				
 		}
 	}
-	if( array_key_exists( 'image_url', $in ) ) {
-		$new_image_item=image2video::save_image_url ( $in['image_url'], $upload_dir, $upload_url, $err )	;
-		if( ! $new_image_item ) {
+	if( array_key_exists( 'audio_url', $in ) ) {
+		$new_audio_item=image2video::save_audio_url ( $in['audio_url'], $upload_dir, $upload_url, $err )	;
+		if( ! $new_audio_item ) {
 			$out['status']='error';
-			$out['errorno']='4111';
-			$out['error']="Error while try save image: $err";
+			$out['errorno']='4121';
+			$out['error']="Error while try save audio: $err";
 			print_json_and_exit( $out );				
 		}
 	}		
-	if( !$new_image_item ) {
+	if( !$new_audio_item ) {
 		$out['status']='error';
-		$out['errorno']='4112';
-		$out['error']="Do not have image for $item_name ";
+		$out['errorno']='4122';
+		$out['error']="Do not have audio for $item_name ";
 		print_json_and_exit( $out );				
 	}		
+	if( array_key_exists( 'id', $in ) ) { # replace
+		$id=$in['id'];
+		$item[$id]=array_replace($item[$id], $new_audio_item );		
+	} else {
+		array_push( $item, $new_audio_item );		
+	}
 	
-	$item[1]=array_replace($item[1], $new_image_item );
 	$filename= $item_file;
 	$string=json_encode( $item, JSON_PRETTY_PRINT );	
 	if( ! file_put_contents( $filename, $string ) ) {
@@ -218,6 +201,48 @@ if( $in['action'] == 'add' ){
 	print_json_and_exit( $out );
 }
 
+
+if( $in['action'] == 'remove' ){
+	if( !file_exists( $item_file ) ) {
+		$out['status']='error';
+		$out['errorno']='4110';
+		$out['error']="$item_name for project with project_id ".$in['project_id']." do not exist ";
+		print_json_and_exit( $out );				
+	}
+	if( !array_key_exists( 'id', $in ) ) {
+		$out['status']='error';
+		$out['errorno']='4123';
+		$out['error']="Did not receive required input parameter 'id'";
+		print_json_and_exit( $out );	
+	}
+	$string = file_get_contents( $item_file );
+	$item = json_decode($string, true);
+	
+	$rnd=$item[1]['rnd'];
+	$enable=$item[1]['enable'];
+	$item_selected=$item[1]['item_selected'];
+	unset( $item[ $in['id'] ] );
+	$item[1]['rnd']=$rnd;
+	$item[1]['enable']=$enable;
+	$item[1]['item_selected']=$item_selected;
+	# if don't exists the selected audio tracke, set randomize track
+	if( !$item[$item_selected]['name'] ) {
+		$item[1]['rnd']=1;
+	}
+
+	$filename= $item_file;
+	$string=json_encode( $item, JSON_PRETTY_PRINT );			
+	if( ! file_put_contents( $filename, $string ) ) {
+		$out['status']='error';
+		$out['errorno']='4102';
+		$out['error']="Unable to save file '$filename'";
+		print_json_and_exit( $out );			
+	}					
+	$out['rows']=$item;	
+	$out['status']='ok';		
+	print_json_and_exit( $out );
+
+}
 
 
 

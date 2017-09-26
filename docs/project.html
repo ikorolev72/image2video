@@ -3,16 +3,31 @@
 <title>
 IMAGE2VIDEO. API for projects
 </title>
+	<LINK href='main.css' type=text/css rel=stylesheet>
 </head>
 <body>
 <h2><a href='index.html'>API Docs for project image2html</a> </h2>
 <h3>IMAGE2VIDEO. API for projects</h3>
-All request will be doing with web interface, parameter 'id' with json string, someting like: 
-<pre>http://your_ip/image2video/api/project.php?in={%22action%22:%22set_status%22,%22id%22:%22150583385512136%22,%22status%22:%22paused%22}</pre>
-You can make such request with any browser, wget or curl.
+
+You can make request with any browser, wget or curl.
+<pre class='curl_view'>curl -i -X POST -F in='{ "apikey":"315820", "action":"list", "project_id": "150618673841be33720c67f96493b0757f34357fa759b6ce3e"}' http://your_ip/image2video/api/project.php</pre>
+<pre class='curl_view'>curl -i -X POST  -H "Content-Type: multipart/form-data" -F 'in=@/tmp/project.json' http://your_ip/image2video/api/logo.php</pre>
+
 API answer - json string with field status and additional values, for example:
-<pre class='json_view'> {"status": "ok", "id":"1234567"} </pre> or 
-<pre class='json_view'> {"status": "error","errorno": "4000", "error": "Don't recived input parameters" } </pre>
+<pre class='json_view'> 
+{
+	"status": "ok", 
+	"count":"12"
+} 
+</pre> 
+or 
+<pre class='json_view'> 
+{
+	"status": "error",
+	"errorno": "4000", 
+	"error": "Don't recived input parameters" 
+	} 
+</pre>
 
 There are possible next actions: list, count, clone, remove .
 
@@ -26,7 +41,7 @@ Required parameters:<br>
 </ul>
 Optional parameters:<br>
 <ul>
-<li>"id":"1234567" - show info only for project with this id</li>
+<li>"project_id":"1234567" - show info only for project with this id</li>
 </ul>
 Samples:
 
@@ -35,7 +50,7 @@ Request:
 {	
 	"apikey":"315820",
 	"action":"list",
-	"id":"150583385512136"
+	"project_id":"150583385512136"
 }
 </pre>
 Answer:
@@ -111,7 +126,7 @@ Answer:
 <pre class='json_view'>
 {
     "status": "ok",
-    "id": "150618658947796a88478d28f0ade0534bdb7ac02ebc876961"
+    "project_id": "150618658947796a88478d28f0ade0534bdb7ac02ebc876961"
 }
 </pre>
 
@@ -122,7 +137,7 @@ Required parameters:<br>
 <ul>
 <li>"apikey":"315820"</li>
 <li>"action":"clone"</li>
-<li>"id":"123456576"</li>
+<li>"project_id":"123456576"</li>
 
 </ul>
 Optional parameters:<br>
@@ -139,11 +154,11 @@ Request:
 	"name":"New clone of project 1"
 }
 </pre>
-Answer:
+Answer with id of cloned project:
 <pre class='json_view'>
 {
     "status": "ok",
-    "id": "150618673841be33720c67f96493b0757f34357fa759b6ce3e"
+    "project_id": "150618673841be33720c67f96493b0757f34357fa759b6ce3e"
 }
 </pre>
 
@@ -154,7 +169,7 @@ Remove project<br>
 Required parameters:<br>
 <ul>
 <li>"apikey":"315820"</li>
-<li>"id":"1234567"</li>
+<li>"project_id":"1234567"</li>
 </ul>
 Optional parameters:<br>
 <ul>
@@ -166,7 +181,7 @@ Request:
 {	
 	"apikey":"315820",
 	"action":"remove",
-	"id":"150583385512136"
+	"project_id":"150583385512136"
 }
 </pre>
 Answer:

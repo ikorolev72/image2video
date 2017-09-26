@@ -64,24 +64,24 @@ $output_height=image2video::$output_height;
 if( $logo[1]['url'] ) {
 	$logo_filename=$logo[1]['name'];
 	$logo_url=$logo[1]['url'];
-	$logo_x=$logo[1]['logo_x'];
-	$logo_y=$logo[1]['logo_y'];
+	$x=$logo[1]['x'];
+	$y=$logo[1]['y'];
 	$logo_enable_checked='no_checked';
 
-	$logo_w=$logo[1]['logo_w'];
-	$logo_h=$logo[1]['logo_h'];
+	$w=$logo[1]['w'];
+	$h=$logo[1]['h'];
 
 
-	if( $logo[1]['logo_enable'] ) {
+	if( $logo[1]['enable'] ) {
 		$logo_enable_checked='checked';
 	}
 }
 else {	
-	$logo_x=$output_width-200+20;
-	$logo_y=0;	
+	$x=$output_width-200+20;
+	$y=0;	
 	$logo_enable_checked='checked';
-	$logo_w=200;
-	$logo_h=200;	
+	$w=200;
+	$h=200;	
 }
 
 
@@ -102,11 +102,11 @@ $form="
 		
 $form.="
         <tr><td>Add/change logo</td><td><input type='file' name='img[]' multiple> </td></tr>
-        <tr><td>X</td><td><input type='number'  name='logo_x' value='$logo_x' min='0' max='$output_width' > </td></tr>
-        <tr><td>Y</td><td><input type='number'  name='logo_y' value='$logo_y' min='0' max='$output_height' > </td></tr>
-        <tr><td>Resize to width</td><td><input type='number'  name='logo_w' value='$logo_w' min='0' max='$output_width' > </td></tr>
-        <tr><td>Resize to height</td><td><input type='number'  name='logo_h' value='$logo_h' min='0' max='$output_height' > </td></tr>
-        <tr><td>Enable logo</td><td><input type='checkbox'  name='logo_enable' value='1' $logo_enable_checked > </td></tr>
+        <tr><td>X</td><td><input type='number'  name='x' value='$x' min='0' max='$output_width' > </td></tr>
+        <tr><td>Y</td><td><input type='number'  name='y' value='$y' min='0' max='$output_height' > </td></tr>
+        <tr><td>Resize to width</td><td><input type='number'  name='w' value='$w' min='0' max='$output_width' > </td></tr>
+        <tr><td>Resize to height</td><td><input type='number'  name='h' value='$h' min='0' max='$output_height' > </td></tr>
+        <tr><td>Enable logo</td><td><input type='checkbox'  name='enable' value='1' $logo_enable_checked > </td></tr>
         <tr><td></td><td><input type='submit' name='save' value='Save'> </td></tr>	
 	<input type='hidden' name='project_id' value='$project_id'>		
 	</table>
@@ -203,46 +203,46 @@ $img_desc = image2video::reArrayFiles($img);
 		);
 
     }
-	if( $_POST['logo_x'] <0 ) 		{
+	if( $_POST['x'] <0 ) 		{
 			$errors[]="Logo x and y coordinates must be zero or positive. X and Y set to 0";
-			$_POST['logo_x']=0;
-			$_POST['logo_y']=0;
+			$_POST['x']=0;
+			$_POST['y']=0;
 		}
-	if( ! $_POST['logo_w']  || $_POST['logo_h'] || $_POST['logo_w']>$output_width || $_POST['logo_h']>$output_height ) 	
+	if( ! $_POST['w']  || $_POST['h'] || $_POST['w']>$output_width || $_POST['h']>$output_height ) 	
 		{
 			$errors[]="Logo width and height set to 200";
-			$_POST['logo_w']=200;
-			$_POST['logo_h']=200;
+			$_POST['w']=200;
+			$_POST['h']=200;
 		}
 		
-	$files_info[$k]['logo_x']=intval( $_POST['logo_x'] );
-	$files_info[$k]['logo_y']=intval( $_POST['logo_y'] );
-	$files_info[$k]['logo_w']=intval( $_POST['logo_w'] );
-	$files_info[$k]['logo_h']=intval( $_POST['logo_h'] );
-	$files_info[$k]['logo_enable']=$_POST['logo_enable'];
+	$files_info[$k]['x']=intval( $_POST['x'] );
+	$files_info[$k]['y']=intval( $_POST['y'] );
+	$files_info[$k]['w']=intval( $_POST['w'] );
+	$files_info[$k]['h']=intval( $_POST['h'] );
+	$files_info[$k]['enable']=$_POST['enable'];
 	
 } else {
 
 	$files_info=&$logo;
 	$k=1;
-	if( $_POST['logo_x'] <0 ) 		{
+	if( $_POST['x'] <0 ) 		{
 			$errors[]="Logo x and y coordinates must be zero or positive. X and Y set to 0";
-			$_POST['logo_x']=0;
-			$_POST['logo_y']=0;
+			$_POST['x']=0;
+			$_POST['y']=0;
 		}
-	if( !$_POST['logo_w']  || !$_POST['logo_h'] || $_POST['logo_w']>$output_width || $_POST['logo_h']>$output_height ) 	
+	if( !$_POST['w']  || !$_POST['h'] || $_POST['w']>$output_width || $_POST['h']>$output_height ) 	
 		{
 			$errors[]="Logo width and height set to 200";
-			$_POST['logo_w']=200;
-			$_POST['logo_h']=200;
+			$_POST['w']=200;
+			$_POST['h']=200;
 		}
-	$files_info[$k]['logo_x']=intval( $_POST['logo_x'] );
-	$files_info[$k]['logo_y']=intval( $_POST['logo_y'] );
-	$files_info[$k]['logo_w']=intval( $_POST['logo_w'] );
-	$files_info[$k]['logo_h']=intval( $_POST['logo_h'] );
-	#$files_info[$k]['logo_x']=$_POST['logo_x'];
-	#$files_info[$k]['logo_y']=$_POST['logo_y'];
-	$files_info[$k]['logo_enable']=$_POST['logo_enable'];
+	$files_info[$k]['x']=intval( $_POST['x'] );
+	$files_info[$k]['y']=intval( $_POST['y'] );
+	$files_info[$k]['w']=intval( $_POST['w'] );
+	$files_info[$k]['h']=intval( $_POST['h'] );
+	#$files_info[$k]['x']=$_POST['x'];
+	#$files_info[$k]['y']=$_POST['y'];
+	$files_info[$k]['enable']=$_POST['enable'];
 }	
 
 

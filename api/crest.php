@@ -24,7 +24,7 @@ var_dump( $_FILES );
 */
 
 $json_in=commonapi::get_param( 'in' );
-$item_name='logo';
+$item_name='crest';
 
 if( !$json_in ) {
 	$out['status']='error';
@@ -134,7 +134,7 @@ if( $in['action'] == 'set' ){
 
 }
 
-# action 'add' new logo
+# action 'add' new crest
 if( $in['action'] == 'add' ){	
 	$err=null;
 	$upload_dir="$main_upload_dir/$project_id";
@@ -145,7 +145,7 @@ if( $in['action'] == 'add' ){
 	} else {
 		$item = array();
 		$item[1]["enable"]="1";
-		$item[1]["x"]=image2video::$output_width-200+20 ;
+		$item[1]["x"]=20 ;
 		$item[1]["y"]=0 ;
 		$item[1]["w"]=200 ;
 		$item[1]["h"]=200 ;
@@ -155,7 +155,7 @@ if( $in['action'] == 'add' ){
 	}
 	if( array_key_exists( 'x', $in ) )  {
 		$v=intval( $in['x'] );
-		$item[1]["x"]=(  $v>0 && $v<image2video::$output_width ) ? $v : image2video::$output_width-200+20 ;
+		$item[1]["x"]=(  $v>0 && $v<image2video::$output_width ) ? $v : 20 ;
 	}
 	if( array_key_exists( 'y', $in ) )  {
 		$v=intval( $in['y'] );

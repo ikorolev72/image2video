@@ -1,0 +1,261 @@
+<html>
+<head>
+<title>
+IMAGE2VIDEO. API for audio
+</title>
+	<LINK href='main.css' type=text/css rel=stylesheet>
+</head>
+<body>
+<h2><a href='index.html'>API Docs for project image2html</a> </h2>
+<h3>IMAGE2VIDEO. API for audio</h3>
+
+You can make request with any browser, wget or curl.
+<pre class='curl_view'>curl -i -X POST -F in='{ "apikey":"315820", "action":"list", "project_id": "150618673841be33720c67f96493b0757f34357fa759b6ce3e"}' http://your_ip/image2video/api/audio.php</pre>
+<pre class='curl_view'>curl -i -X POST  -H "Content-Type: multipart/form-data" -F 'in=@/tmp/audio.json' http://your_ip/image2video/api/audio.php</pre>
+ 
+API answer - json string with field status and additional values, for example:
+<pre class='json_view'> 
+{
+	"status": "ok", 
+	"count":"12"
+} 
+</pre> 
+or 
+<pre class='json_view'> 
+{
+	"status": "error",
+	"errorno": "4000", 
+	"error": "Don't recived input parameters" 
+	} 
+</pre>
+
+There are possible next actions: list, add, set, remove .
+
+<hr>
+<h3>list</h3>
+By default, return list of audio tracks and properties.<br>
+Required parameters:<br>
+<ul>
+<li>"apikey":"315820"</li>
+<li>"action":"list"</li>
+<li>"project_id":"1234567"</li>
+</ul>
+Optional parameters:<br>
+<ul>
+</ul>
+Samples:
+
+Request:
+<pre class='json_view'>
+{	
+	"apikey":"315820",
+	"action":"list",
+	"project_id":"150583385512136"
+}
+</pre>
+Answer:
+<pre class='json_view'>
+{
+    "status": "ok",
+    "rows": {
+        "1": {
+            "url": ".\/uploads\/1506434446ff8fed4d5545d867cd7dc47479c0e108e39f341e\/64b116fac2d01cf73c651012ead5a50627a22ec1.mp3",
+            "name": "\/var\/www\/html\/screenshot.unixpin.com\/image2video\/uploads\/1506434446ff8fed4d5545d867cd7dc47479c0e108e39f341e\/64b116fac2d01cf73c651012ead5a50627a22ec1.mp3",
+            "ext": "mp3",
+            "size": 1257690,
+            "type": "audio\/mp3",
+            "enable": "1",
+            "rnd": null,
+            "item_selected": "2"
+        },
+        "2": {
+            "url": ".\/uploads\/1506434446ff8fed4d5545d867cd7dc47479c0e108e39f341e\/66766d6d4efd6378516e22db3edcc650fc234f9f.mp3",
+            "name": "\/var\/www\/html\/screenshot.unixpin.com\/image2video\/uploads\/1506434446ff8fed4d5545d867cd7dc47479c0e108e39f341e\/66766d6d4efd6378516e22db3edcc650fc234f9f.mp3",
+            "ext": "mp3",
+            "size": 2646308,
+            "type": "audio\/mp3"
+        }
+    }
+}
+</pre>
+
+
+<hr>
+<h3>set</h3>
+Set audio properties<br>
+Required parameters:<br>
+<ul>
+<li>"apikey":"315820"</li>
+<li>"action":"set"</li>
+<li>"project_id":"1234567"</li>
+</ul>
+Optional parameters:<br>
+<ul>
+<li>"rnd":1</li>
+<li>"enable":0</li>
+<li>"item_selected":2</li>
+</ul>
+
+
+Samples:
+
+Request:
+<pre class='json_view'>
+{	
+	"apikey":"31520",
+	"action":"set",
+	"project_id": "150618673841be33720c67f96493b0757f34357fa759b6ce3e",
+	"enable":1,
+	"rnd":0,
+	"item_selected":3
+}
+</pre>
+Answer:
+<pre class='json_view'>
+{
+    "rows": {
+        "1": {
+            "url": ".\/uploads\/1506434446ff8fed4d5545d867cd7dc47479c0e108e39f341e\/64b116fac2d01cf73c651012ead5a50627a22ec1.mp3",
+            "name": "\/var\/www\/html\/screenshot.unixpin.com\/image2video\/uploads\/1506434446ff8fed4d5545d867cd7dc47479c0e108e39f341e\/64b116fac2d01cf73c651012ead5a50627a22ec1.mp3",
+            "ext": "mp3",
+            "size": 1257690,
+            "type": "audio\/mp3",
+            "enable": "1",
+            "rnd": null,
+            "item_selected": "3"
+        },
+        "3": {
+            "url": ".\/uploads\/1506434446ff8fed4d5545d867cd7dc47479c0e108e39f341e\/af8bc8f42888035ed1d86f878fc9676df0a2e867.mp3",
+            "name": "\/var\/www\/html\/screenshot.unixpin.com\/image2video\/uploads\/1506434446ff8fed4d5545d867cd7dc47479c0e108e39f341e\/af8bc8f42888035ed1d86f878fc9676df0a2e867.mp3",
+            "ext": "mp3",
+            "size": 2475153,
+            "type": "audio\/mp3"
+        }
+    },
+    "status": "ok"
+}
+</pre>
+
+
+
+
+<hr>
+<h3>add</h3>
+Add new ( or replace existing ) audio<br>
+Required parameters:<br>
+<ul>
+<li>"apikey":"315820"</li>
+<li>"action":"add"</li>
+<li>"project_id":"1234567"</li>
+
+</ul>
+Optional parameters:<br>
+<ul>
+<li><s>"image_base64":"/9j/4AAQSkZJRgABAQEAYABgAAD//gA7Q1JFQVRPUjogZ2QtanBlZyB2MS4wIC..."</s></li>
+<li>"image_copy":"\/home\/user\/audio\/gifts.mp3"</li>
+<li>"image_url":"http:\/\/example.com\/static\/audio\/gifts.mp3"</li>
+<li>"rnd":1</li>
+<li>"enable":0</li>
+<li>"item_selected":2</li>
+<li>"id":3</li>
+</ul>
+Samples:
+
+Request:
+<pre class='json_view'>
+{
+    "apikey":"315820",
+    "action":"add",
+    "project_id": "1506434446ff8fed4d5545d867cd7dc47479c0e108e39f341e",
+	"audio_copy":"\/var\/www\/html\/screenshot.unixpin.com\/image2video\/uploads\/1506434446ff8fed4d5545d867cd7dc47479c0e108e39f341e\/66766d6d4efd6378516e22db3edcc650fc234f9f.mp3"
+}
+
+</pre>
+Answer:
+<pre class='json_view'>
+{
+    "status": "ok",
+    "rows": {
+        "1": {
+            "url": ".\/uploads\/1506434446ff8fed4d5545d867cd7dc47479c0e108e39f341e\/bf8a1491c0b229cec3f285d65bab9f2cc7a08017.mp3",
+            "name": "\/var\/www\/html\/screenshot.unixpin.com\/image2video\/uploads\/1506434446ff8fed4d5545d867cd7dc47479c0e108e39f341e\/bf8a1491c0b229cec3f285d65bab9f2cc7a08017.mp3",
+            "ext": "mp3",
+            "size": 2646308,
+            "type": "audio\/mpeg",
+            "enable": "1",
+            "rnd": null,
+            "item_selected": "3"
+        },
+        "3": {
+            "url": ".\/uploads\/1506434446ff8fed4d5545d867cd7dc47479c0e108e39f341e\/af8bc8f42888035ed1d86f878fc9676df0a2e867.mp3",
+            "name": "\/var\/www\/html\/screenshot.unixpin.com\/image2video\/uploads\/1506434446ff8fed4d5545d867cd7dc47479c0e108e39f341e\/af8bc8f42888035ed1d86f878fc9676df0a2e867.mp3",
+            "ext": "mp3",
+            "size": 2475153,
+            "type": "audio\/mp3"
+        },
+        "4": {
+            "url": ".\/uploads\/1506434446ff8fed4d5545d867cd7dc47479c0e108e39f341e\/bf8a1491c0b229cec3f285d65bab9f2cc7a08017.mp3",
+            "name": "\/var\/www\/html\/screenshot.unixpin.com\/image2video\/uploads\/1506434446ff8fed4d5545d867cd7dc47479c0e108e39f341e\/bf8a1491c0b229cec3f285d65bab9f2cc7a08017.mp3",
+            "ext": "mp3",
+            "size": 2646308,
+            "type": "audio\/mpeg"
+        }
+    }
+}
+</pre>
+
+
+
+<hr>
+<h3>remove</h3>
+Remove audio track<br>
+Required parameters:<br>
+<ul>
+<li>"apikey":"315820"</li>
+<li>"action":"add"</li>
+<li>"project_id":"1234567"</li>
+<li>"id":2</li>
+
+</ul>
+Optional parameters:<br>
+<ul>
+</ul>
+Samples:
+
+Request:
+<pre class='json_view'>
+{
+	"apikey":"315820",
+	"project_id": "150618673841be33720c67f96493b0757f34357fa759b6ce3e",	
+	"action":"remove",
+	"id": 2
+}
+</pre>
+Answer:
+<pre class='json_view'>
+{
+    "rows": {
+        "1": {
+            "url": ".\/uploads\/1506434446ff8fed4d5545d867cd7dc47479c0e108e39f341e\/64b116fac2d01cf73c651012ead5a50627a22ec1.mp3",
+            "name": "\/var\/www\/html\/screenshot.unixpin.com\/image2video\/uploads\/1506434446ff8fed4d5545d867cd7dc47479c0e108e39f341e\/64b116fac2d01cf73c651012ead5a50627a22ec1.mp3",
+            "ext": "mp3",
+            "size": 1257690,
+            "type": "audio\/mp3",
+            "enable": "1",
+            "rnd": null,
+            "item_selected": "3"
+        },
+        "3": {
+            "url": ".\/uploads\/1506434446ff8fed4d5545d867cd7dc47479c0e108e39f341e\/af8bc8f42888035ed1d86f878fc9676df0a2e867.mp3",
+            "name": "\/var\/www\/html\/screenshot.unixpin.com\/image2video\/uploads\/1506434446ff8fed4d5545d867cd7dc47479c0e108e39f341e\/af8bc8f42888035ed1d86f878fc9676df0a2e867.mp3",
+            "ext": "mp3",
+            "size": 2475153,
+            "type": "audio\/mp3"
+        }
+    },
+    "status": "ok"
+}
+</pre>
+
+</body>
+</html>

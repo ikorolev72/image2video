@@ -113,9 +113,7 @@ function add_task_row( $row ) {
 }
 
 
-function check_apikey( $key ){
-	return (true);
-}
+
 
 function checkPidProcess ($pidFileName) {
 	if( !file_exists ($pidFileName)) return 0;
