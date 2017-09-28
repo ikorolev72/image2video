@@ -73,11 +73,12 @@ if( $rnd ) {
 	$rnd_checked='checked' ;
 }
 
+/*
 echo "<pre>";
 echo var_dump($rnd);
 echo var_dump($enable);
 echo "</pre>";
-
+*/
 
 
 

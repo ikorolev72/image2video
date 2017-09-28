@@ -20,6 +20,20 @@ public static $google_map_api_key="AIzaSyCgO4NtJv7hqYId6_yohnSIFMbvKy8nLg4";
 public static $queue4job_use=true;
 public static $queue4job_path="/var/www/html/screenshot.unixpin.com/image2video/queue";
 
+public static $possible_import_names=array(   
+	'map'=>'map.txt',
+	'images'=>'images.txt',
+	'crest'=>'crest.txt',
+	'logo'=>'logo.txt'
+);
+
+public static $effects_common_settings=array(
+	'audio_fade_in',
+	'audio_fade_out',
+	'fade_in',
+	'fade_out',
+	'disable_crest_for_last_image' 
+);	
 
 function reWrapText(  $text, $output_width, $font_size )
 {
@@ -357,6 +371,38 @@ function save_audio_url ( $url, $upload_dir, $upload_url, &$err ) {
 		return(0);
 	}
 	return( self::save_audio ( $filename, $upload_dir, $upload_url, $err ) );
+}
+
+function default_effect() {
+		$effect=array(
+			'fade_in'=>	1 ,
+			'audio_fade_in'=>	1 ,
+			'fade_out'=>	1 ,
+			'audio_fade_out'=>	1 ,
+			'duration'=>	10 ,
+			'animation'=>	'none',
+			'text'=>	'',
+			'text_x'=>	0,
+			'text_y'=>	0,
+			'font'=>	self::$font,
+			'font_size'=>	 self::$font_size,
+			'text_color'=>	'FFFFFF',
+			'text_boxborder_color'=>	'CCCCCC',
+			'text_boxopacity'=>	0,
+			'transition'=>	'none',
+			'crop_image'=>	1,
+			'text_wrap'=>	0,
+			'disable_crest_for_last_image' => 1				
+		);	
+	return( $effect );
+}
+
+function save_settings( $item, $keys ) {
+	$saved_values=array();
+	foreach( $keys as $k ) {
+		if( isset( $item[1][$k] ) ) $saved_values[$k]=$item[1][$k];
+	}		
+	return( $saved_values);
 }
 
 

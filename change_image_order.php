@@ -55,28 +55,20 @@ $project = json_decode($string, true);
 
 $files_info=array();
 
+	$image_id=image2video::get_param( 'image_id' );
+	$new_image_id=image2video::get_param( 'new_image_id' );
+	$move_image=image2video::get_param( 'move_image' );
 
-	if( $_POST['move_image'] && $_POST['image_id'] && $_POST['new_image_id'] ) {
-		$image_id=$_POST['image_id'];
-		$new_image_id=$_POST['new_image_id'];
-		/*
-			$i=1;
-			foreach( $images as $k=>$val ):
-				if( $k != $image_id  ) {
-					$new_images[$i]=$images[$k] ;
-					$new_effects[$i]=$effects[$k] ;					
-					$i++;
-				}
+	if( $move_image && $image_id && $new_image_id ) {
 
-			endforeach;				
-		*/
 	$replaced=0;
 			$i=1;
 			$new_images=array();
-			$new_effect=array();	
+			$new_effects=array();	
 			
 			echo( "<pre>");
-			
+
+			$saved_values=image2video::save_settings( $effects, image2video::$effects_common_settings ) ;			
 			foreach( $images as $k=>$val ){
 				if( $k==$new_image_id ) {
 					$new_images[$i]=$images[$image_id] ;
@@ -94,6 +86,8 @@ $files_info=array();
 				$new_images[$i]=$images[$image_id] ;
 				$new_effects[$i]=$effects[$image_id] ;
 			}	
+			$new_effects[1]=array_replace($new_effects[1], $saved_values );
+			
 			echo( "</pre>");
 	
 
@@ -136,7 +130,6 @@ if(!empty($images))
 	foreach($images as $k=>$val):
 		$keys = array_keys($val);
 		$form_fied_alert=array();
-		$record_count++;
 
 		echo "<tr valign=center align=right>
 			<td>  </td>

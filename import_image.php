@@ -61,14 +61,10 @@ $import_key=image2video::get_param( 'import_key' );
 #$import_name=$_POST['import_name'];
 #if( !$import_name ) $import_name=$_GET['import_name'];
 
-$possible_import_names=array();
-$possible_import_names['map']='map.txt';
-$possible_import_names['images']='images.txt';
-$possible_import_names['crest']='crest.txt';
-$possible_import_names['logo']='logo.txt';
 
-if( $import_name  && $possible_import_names[$import_name] ) {
-	$import_filename="$upload_dir/".$possible_import_names[$import_name];
+
+if( $import_name  && image2video::$possible_import_names[$import_name] ) {
+	$import_filename="$upload_dir/".image2video::$possible_import_names[$import_name];
 	if( !file_exists( $import_filename ) ) {
 		$errors[]="File '$import_filename' with image info do not exists";				
 	} else {
@@ -91,7 +87,7 @@ if( $import_name  && $possible_import_names[$import_name] ) {
 	echo '<h3> Project: '.$project['project_name'].'</h3>';	
 	echo image2video::showMenu( $project_id );
 		echo "<table> ";
-			foreach( $possible_import_names as $k=>$val ){
+			foreach( image2video::$possible_import_names as $k=>$val ){
 				echo "<tr><td>Import <a href='?project_id=$project_id&import_key=1&import_name=$k'> $k </a> ";
 				echo "</td></tr>";				
 			}
@@ -113,10 +109,11 @@ $files_info=array();
 			$replaced=0;
 			$i=1;
 			$new_images=array();
-			$new_effect=array();	
+			$new_effects=array();	
 			
 			echo( "<pre>");
 			
+			$saved_values=image2video::save_settings( $effects, image2video::$effects_common_settings ) ;			
 
 			foreach( $images as $k=>$val ){
 				if( $k==$new_image_id ) {
@@ -133,6 +130,8 @@ $files_info=array();
 				$new_images[$i]=$import[$import_key] ;
 				$new_effects[$i]=array() ;
 			}	
+			$new_effects[1]=array_replace($new_effects[1], $saved_values );
+			
 			echo( "</pre>");
 	
 

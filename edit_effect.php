@@ -128,12 +128,11 @@ foreach($images as $k=>$val):
 	if( $_POST['save'] ) {	
 		# check and fix values
 
-		$fade_in=$_POST['fade_in'][$k];
-		$audio_fade_in=$_POST['audio_fade_in'][$k];
-		$fade_out=$_POST['fade_out'][$k];
-		$audio_fade_out=$_POST['audio_fade_out'][$k];
-
-		$disable_crest_for_last_image=$_POST['disable_crest_for_last_image'][$k];
+		$fade_in=$_POST['fade_in'][1];
+		$audio_fade_in=$_POST['audio_fade_in'][1];
+		$fade_out=$_POST['fade_out'][1];
+		$audio_fade_out=$_POST['audio_fade_out'][1];
+		$disable_crest_for_last_image=$_POST['disable_crest_for_last_image'][1];
 		
 		$duration= $_POST['duration'][$k];
 		if (empty($_POST['duration'][$k]) || !is_numeric( $duration) ) {
@@ -194,15 +193,17 @@ foreach($images as $k=>$val):
 		if( $crop_image  ) {
 			$crop_image=1	;		
 		}
-		
-		
+	
 	} 
 	else {
 		if( $effects[$k]['duration'] ) {
-			$fade_in= $effects[$k]['fade_in'];
-			$audio_fade_in= $effects[$k]['audio_fade_in'];
-			$fade_out= $effects[$k]['fade_out'];
-			$audio_fade_out= $effects[$k]['audio_fade_out'];
+			
+			$fade_in= $effects[1]['fade_in'];
+			$audio_fade_in= $effects[1]['audio_fade_in'];
+			$fade_out= $effects[1]['fade_out'];
+			$audio_fade_out= $effects[1]['audio_fade_out'];
+			$disable_crest_for_last_image= $effects[1]['disable_crest_for_last_image'];
+
 			$duration= $effects[$k]['duration'];
 			$animation= $effects[$k]['animation'] ;
 			$text= $effects[$k]['text'];
@@ -216,7 +217,6 @@ foreach($images as $k=>$val):
 			$transition= $effects[$k]['transition'] ;
 			$text_wrap= $effects[$k]['text_wrap'];
 			$crop_image= $effects[$k]['crop_image'];
-			$disable_crest_for_last_image= $effects[$k]['disable_crest_for_last_image'];
 		}
 		else { 
 			# set default values
@@ -245,27 +245,30 @@ foreach($images as $k=>$val):
 			
 		}
 	}
-		$effects_info[$k]=array(
-			'fade_in'=>	$fade_in ,
-			'audio_fade_in'=>	$audio_fade_in ,
-			'fade_out'=>	$fade_out ,
-			'audio_fade_out'=>	$audio_fade_out ,
-			'duration'=>	$duration ,
-			'animation'=>	$animation,
-			'text'=>	$text,
-			'text_x'=>	$text_x,
-			'text_y'=>	$text_y,
-			'font'=>	$font,
-			'font_size'=>	$font_size,
-			'text_color'=>	$text_color,
-			'text_boxborder_color'=>	$text_boxborder_color,
-			'text_boxopacity'=>	$text_boxopacity,
-			'transition'=>	$transition,
-			'crop_image'=>	$crop_image,
-			'text_wrap'=>	$text_wrap,
-			'disable_crest_for_last_image' => $disable_crest_for_last_image			
-			
-		);	
+	$effects_info[$k]=array(
+
+		'fade_in'=>	$fade_in ,
+		'audio_fade_in'=>	$audio_fade_in ,
+		'fade_out'=>	$fade_out ,
+		'audio_fade_out'=>	$audio_fade_out ,
+		'disable_crest_for_last_image' => $disable_crest_for_last_image	,		
+
+		'duration'=>	$duration ,
+		'animation'=>	$animation,
+		'text'=>	$text,
+		'text_x'=>	$text_x,
+		'text_y'=>	$text_y,
+		'font'=>	$font,
+		'font_size'=>	$font_size,
+		'text_color'=>	$text_color,
+		'text_boxborder_color'=>	$text_boxborder_color,
+		'text_boxopacity'=>	$text_boxopacity,
+		'transition'=>	$transition,
+		'crop_image'=>	$crop_image,
+		'text_wrap'=>	$text_wrap,
+		
+	);
+	
 	if( ! $first_record ) {
 		echo "</td>
 		</tr>
@@ -294,13 +297,13 @@ foreach($images as $k=>$val):
 		<tr valign=top bgcolor='#E1E7F3'>
 		<td>Fade in</td>
 		<td>
-		<input type='checkbox' name='fade_in[$k]' $fade_in_checked> 
+		<input type='checkbox' name='fade_in[1]' $fade_in_checked> 
 		</td>
 		</tr>
 		<tr valign=top bgcolor='#E1E7F3'>
 		<td>Audio fade in</td>
 		<td>
-		<input type='checkbox' name='audio_fade_in[$k]' $audio_fade_in_checked> 
+		<input type='checkbox' name='audio_fade_in[1]' $audio_fade_in_checked> 
 		</td>
 		</tr>
 		";	
@@ -327,9 +330,6 @@ foreach($images as $k=>$val):
 		<tr><td ".$form_fied_alert['text'][$k]." >Text:</td><td><textarea name='text[$k]' cols=30 rows=3>$text</textarea> </td></tr>
 		<tr><td ".$form_fied_alert['font'][$k]." >Font:</td><td>
 			<select name='font[$k]'>";
-//		<tr><td ".$form_fied_alert['text'][$k]." >Text:</td><td><input type='text' name='text[$k]' value='$text' size=32> </td></tr>
-//		<tr><td ".$form_fied_alert['text_x'][$k]." >X:</td><td><input type='number' name='text_x[$k]' value='$text_x' min='0' max='1920' size=4 > </td></tr>
-//		<tr><td ".$form_fied_alert['text_y'][$k]." >Y:</td><td><input type='number' name='text_y[$k]' value='$text_y' min='0' max='1080' size=4 > </td></tr>
 			echo "<option value='$font' selected> $font </option>\n";
 			foreach ($fonts_array as $font_num=>$font_line) {
 				$rtrim_font_line=rtrim($font_line);
@@ -372,19 +372,19 @@ endforeach;
 		<tr valign=top bgcolor='#E1E7F3'>
 		<td>Disable crest and logo for the last image</td>
 		<td>
-		<input type=checkbox name='disable_crest_for_last_image[$last_record]' $disable_crest_for_last_image_checked> 
+		<input type=checkbox name='disable_crest_for_last_image[1]' $disable_crest_for_last_image_checked> 
 		</td>
 		</tr>
 		<tr valign=top bgcolor='#E1E7F3'>
 		<td>Fade out</td>
 		<td>
-		<input type=checkbox name='fade_out[$last_record]' $fade_out_checked> 
+		<input type=checkbox name='fade_out[1]' $fade_out_checked> 
 		</td>
 		</tr>
 		<tr valign=top bgcolor='#E1E7F3'>
 		<td>Audio fade out</td>
 		<td>
-		<input type=checkbox name='audio_fade_out[$last_record]' $audio_fade_out_checked> 
+		<input type=checkbox name='audio_fade_out[1]' $audio_fade_out_checked> 
 		</td>
 		</tr>
 				<tr><td>
@@ -554,10 +554,11 @@ foreach($images as $k=>$val):
 		$image_h=$val['height'];
 		$image_type=$val['type'];
 
-		$fade_in= $effects[$k]['fade_in'];
-		$audio_fade_in= $effects[$k]['audio_fade_in'];
-		$fade_out= $effects[$k]['fade_out'];
-		$audio_fade_out= $effects[$k]['audio_fade_out'];
+		$fade_in= $effects[1]['fade_in'];
+		$audio_fade_in= $effects[1]['audio_fade_in'];
+		$fade_out= $effects[1]['fade_out'];
+		$audio_fade_out= $effects[1]['audio_fade_out'];
+		$disable_crest_for_last_image=$effects[1]['disable_crest_for_last_image'];
 		
 		$duration= $effects[$k]['duration'];
 		$animation= $effects[$k]['animation'];
@@ -573,7 +574,6 @@ foreach($images as $k=>$val):
 		$transition= $effects[$k]['transition'];
 		$text_wrap= $effects[$k]['text_wrap'];
 		$crop_image= $effects[$k]['crop_image'];
-		$disable_crest_for_last_image=$effects[$k]['disable_crest_for_last_image'];
 		
 		if( ! $duration ) $duration=10;
 

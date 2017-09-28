@@ -200,7 +200,7 @@ if( $in['action'] == 'add' ){
 	if( !$new_image_item ) {
 		$out['status']='error';
 		$out['errorno']='4112';
-		$out['error']="Do not have image for $item_name ";
+		$out['error']="Do not have image for $item_name ( please use any image_url, image_copy, image_base64 for new image)";
 		print_json_and_exit( $out );				
 	}		
 	

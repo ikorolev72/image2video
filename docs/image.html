@@ -1,0 +1,279 @@
+<html>
+<head>
+<title>
+IMAGE2VIDEO. API for image
+</title>
+	<LINK href='main.css' type=text/css rel=stylesheet>
+</head>
+<body>
+<h2><a href='index.html'>API Docs for project image2html</a> </h2>
+<h3>IMAGE2VIDEO. API for image</h3>
+
+You can make request with any browser, wget or curl.
+<pre class='curl_view'>curl -i -X POST -F in='{ "apikey":"315820", "action":"list", "project_id": "150618673841be33720c67f96493b0757f34357fa759b6ce3e"}' http://your_ip/image2video/api/image.php</pre>
+<pre class='curl_view'>curl -i -X POST  -H "Content-Type: multipart/form-data" -F 'in=@/tmp/image.json' http://your_ip/image2video/api/image.php</pre>
+ 
+API answer - json string with field status and additional values, for example:
+<pre class='json_view'> 
+{
+	"status": "ok", 
+	"count":"12"
+} 
+</pre> 
+or 
+<pre class='json_view'> 
+{
+	"status": "error",
+	"errorno": "4000", 
+	"error": "Don't recived input parameters" 
+	} 
+</pre>
+
+There are possible next actions: list, add, remove, move .
+
+<hr>
+<h3>list</h3>
+By default, return images properties.<br>
+Required parameters:<br>
+<ul>
+<li>"apikey":"315820"</li>
+<li>"action":"list"</li>
+<li>"project_id":"1234567"</li>
+</ul>
+Optional parameters:<br>
+<ul>
+</ul>
+Samples:
+
+Request:
+<pre class='json_view'>
+{	
+	"apikey":"315820",
+	"action":"list",
+	"project_id":"150583385512136"
+}
+</pre>
+Answer:
+<pre class='json_view'>
+{
+    "status": "ok",
+    "rows": {
+        "1": {
+            "url": ".\/uploads\/150658847012e8ab9d80ae27434d5af49ca8ac7448b9ef67ee\/6a4bf9cd5727d7e85a371c932daa30db50db2fc3.jpg",
+            "name": "\/var\/www\/html\/screenshot.unixpin.com\/image2video\/uploads\/150658847012e8ab9d80ae27434d5af49ca8ac7448b9ef67ee\/6a4bf9cd5727d7e85a371c932daa30db50db2fc3.jpg",
+            "ext": "jpg",
+            "size": 140337,
+            "type": "image\/jpeg",
+            "width": 906,
+            "height": 604,
+            "thumb_name": "\/var\/www\/html\/screenshot.unixpin.com\/image2video\/uploads\/150658847012e8ab9d80ae27434d5af49ca8ac7448b9ef67ee\/thumb_6a4bf9cd5727d7e85a371c932daa30db50db2fc3.jpg",
+            "thumb_url": ".\/uploads\/150658847012e8ab9d80ae27434d5af49ca8ac7448b9ef67ee\/thumb_6a4bf9cd5727d7e85a371c932daa30db50db2fc3.jpg",
+            "thumb_w": 150,
+            "thumb_h": 100
+        },
+        "2": {
+            "url": ".\/uploads\/150658847012e8ab9d80ae27434d5af49ca8ac7448b9ef67ee\/6a4bf9cd5727d7e85a371c932daa30db50db2fc3.jpg",
+            "name": "\/var\/www\/html\/screenshot.unixpin.com\/image2video\/uploads\/150658847012e8ab9d80ae27434d5af49ca8ac7448b9ef67ee\/6a4bf9cd5727d7e85a371c932daa30db50db2fc3.jpg",
+            "ext": "jpg",
+            "size": 140337,
+            "type": "image\/jpeg",
+            "width": 906,
+            "height": 604,
+            "thumb_name": "\/var\/www\/html\/screenshot.unixpin.com\/image2video\/uploads\/150658847012e8ab9d80ae27434d5af49ca8ac7448b9ef67ee\/thumb_6a4bf9cd5727d7e85a371c932daa30db50db2fc3.jpg",
+            "thumb_url": ".\/uploads\/150658847012e8ab9d80ae27434d5af49ca8ac7448b9ef67ee\/thumb_6a4bf9cd5727d7e85a371c932daa30db50db2fc3.jpg",
+            "thumb_w": 150,
+            "thumb_h": 100
+        }
+    }
+
+}
+</pre>
+
+
+<hr>
+<h3>move</h3>
+Move order of images. <br>
+Required parameters:<br>
+<ul>
+<li>"apikey":"315820"</li>
+<li>"action":"set"</li>
+<li>"project_id":"1234567"</li>
+<li>"id":2</li>
+<li>"new_id":3</li>
+</ul>
+Optional parameters:<br>
+<ul>
+</ul>
+
+
+Samples:
+
+Request:
+<pre class='json_view'>
+{
+        "apikey":"315820",
+        "action":"move",
+        "id":1,
+        "project_id": "150658847012e8ab9d80ae27434d5af49ca8ac7448b9ef67ee",
+        "new_id":3
+
+}
+</pre>
+Answer:
+<pre class='json_view'>
+{
+    "rows": {
+        "1": {
+            "url": ".\/uploads\/150658847012e8ab9d80ae27434d5af49ca8ac7448b9ef67ee\/2198503a472444dd31f6e02e5174aa7a0e1a810e.jpg",
+            "name": "\/var\/www\/html\/screenshot.unixpin.com\/image2video\/uploads\/150658847012e8ab9d80ae27434d5af49ca8ac7448b9ef67ee\/2198503a472444dd31f6e02e5174aa7a0e1a810e.jpg",
+            "ext": "jpg",
+            "size": 36954,
+            "type": "image\/jpeg",
+            "width": 455,
+            "height": 637,
+            "thumb_name": "\/var\/www\/html\/screenshot.unixpin.com\/image2video\/uploads\/150658847012e8ab9d80ae27434d5af49ca8ac7448b9ef67ee\/thumb_2198503a472444dd31f6e02e5174aa7a0e1a810e.jpg",
+            "thumb_url": ".\/uploads\/150658847012e8ab9d80ae27434d5af49ca8ac7448b9ef67ee\/thumb_2198503a472444dd31f6e02e5174aa7a0e1a810e.jpg",
+            "thumb_w": 71,
+            "thumb_h": 100
+        },
+        "2": {
+            "url": ".\/uploads\/150658847012e8ab9d80ae27434d5af49ca8ac7448b9ef67ee\/968df26a15b1ecbbdd9e26f8a13b99fac33bd68c.jpg",
+            "name": "\/var\/www\/html\/screenshot.unixpin.com\/image2video\/uploads\/150658847012e8ab9d80ae27434d5af49ca8ac7448b9ef67ee\/968df26a15b1ecbbdd9e26f8a13b99fac33bd68c.jpg",
+            "ext": "jpg",
+            "size": 786238,
+            "type": "image\/jpeg",
+            "width": 1800,
+            "height": 1440,
+            "thumb_name": "\/var\/www\/html\/screenshot.unixpin.com\/image2video\/uploads\/150658847012e8ab9d80ae27434d5af49ca8ac7448b9ef67ee\/thumb_968df26a15b1ecbbdd9e26f8a13b99fac33bd68c.jpg",
+            "thumb_url": ".\/uploads\/150658847012e8ab9d80ae27434d5af49ca8ac7448b9ef67ee\/thumb_968df26a15b1ecbbdd9e26f8a13b99fac33bd68c.jpg",
+            "thumb_w": 125,
+            "thumb_h": 100
+        },
+        "3": {
+            "url": ".\/uploads\/150658847012e8ab9d80ae27434d5af49ca8ac7448b9ef67ee\/2198503a472444dd31f6e02e5174aa7a0e1a810e.jpg",
+            "name": "\/var\/www\/html\/screenshot.unixpin.com\/image2video\/uploads\/150658847012e8ab9d80ae27434d5af49ca8ac7448b9ef67ee\/2198503a472444dd31f6e02e5174aa7a0e1a810e.jpg",
+            "ext": "jpg",
+            "size": 36954,
+            "type": "image\/jpeg",
+            "width": 455,
+            "height": 637,
+            "thumb_name": "\/var\/www\/html\/screenshot.unixpin.com\/image2video\/uploads\/150658847012e8ab9d80ae27434d5af49ca8ac7448b9ef67ee\/thumb_2198503a472444dd31f6e02e5174aa7a0e1a810e.jpg",
+            "thumb_url": ".\/uploads\/150658847012e8ab9d80ae27434d5af49ca8ac7448b9ef67ee\/thumb_2198503a472444dd31f6e02e5174aa7a0e1a810e.jpg",
+            "thumb_w": 71,
+            "thumb_h": 100
+        }
+    },
+    "status": "ok"
+}
+</pre>
+
+
+
+
+<hr>
+<h3>add</h3>
+Add new ( or replace existing ) image<br>
+Required parameters:<br>
+<ul>
+<li>"apikey":"315820"</li>
+<li>"action":"add"</li>
+<li>"project_id":"1234567"</li>
+
+</ul>
+Optional parameters:<br>
+<ul>
+<li><s>"image_base64":"/9j/4AAQSkZJRgABAQEAYABgAAD//gA7Q1JFQVRPUjogZ2QtanBlZyB2MS4wIC..."</s></li>
+<li>"image_copy":"\/home\/user\/image\/gifts.jpg"</li>
+<li>"image_url":"http:\/\/example.com\/static\/image\/gifts.jpg"</li>
+</ul>
+Samples:
+
+Request:
+<pre class='json_view'>
+{
+	"apikey":"315820",
+	"action":"add",
+	"image_url":"http:\/\/example.com\/static\/image\/gifts.jpg",
+	"y": 50,
+	"x": 50
+}
+</pre>
+Answer:
+<pre class='json_view'>
+{
+    "status": "ok",
+    "rows": {
+        "1": {
+            "enable": "1",
+            "x": 50,
+            "y": 50,
+            "w": 200,
+            "h": 200,
+            "url": ".\/uploads\/150618673841be33720c67f96493b0757f34357fa759b6ce3e\/31ccdccb9db8cbdf8564ae85065e947480fcab52.jpg",
+            "name": "\/var\/www\/html\/screenshot.unixpin.com\/image2video\/uploads\/150618673841be33720c67f96493b0757f34357fa759b6ce3e\/31ccdccb9db8cbdf8564ae85065e947480fcab52.jpg",
+            "ext": "jpg",
+            "size": 12398,
+            "type": "image\/jpeg",
+            "width": 250,
+            "height": 125,
+            "thumb_name": "\/var\/www\/html\/screenshot.unixpin.com\/image2video\/uploads\/150618673841be33720c67f96493b0757f34357fa759b6ce3e\/thumb_31ccdccb9db8cbdf8564ae85065e947480fcab52.jpg",
+            "thumb_url": ".\/uploads\/150618673841be33720c67f96493b0757f34357fa759b6ce3e\/thumb_31ccdccb9db8cbdf8564ae85065e947480fcab52.jpg",
+            "thumb_w": 200,
+            "thumb_h": 100
+        }
+    }
+}
+</pre>
+
+
+<hr>
+<h3>remove</h3>
+Remove image from list<br>
+Required parameters:<br>
+<ul>
+<li>"apikey":"315820"</li>
+<li>"action":"add"</li>
+<li>"project_id":"1234567"</li>
+<li>"id":2</li>
+
+</ul>
+Optional parameters:<br>
+<ul>
+</ul>
+Samples:
+
+Request:
+<pre class='json_view'>
+{
+    "apikey":"315820",
+    "action":"remove",
+    "id":2,
+    "project_id": "150658847012e8ab9d80ae27434d5af49ca8ac7448b9ef67ee"
+}
+</pre>
+Answer:
+<pre class='json_view'>
+{
+    "status": "ok",
+    "rows": {
+        "1": {
+            "url": ".\/uploads\/150618673841be33720c67f96493b0757f34357fa759b6ce3e\/31ccdccb9db8cbdf8564ae85065e947480fcab52.jpg",
+            "name": "\/var\/www\/html\/screenshot.unixpin.com\/image2video\/uploads\/150618673841be33720c67f96493b0757f34357fa759b6ce3e\/31ccdccb9db8cbdf8564ae85065e947480fcab52.jpg",
+            "ext": "jpg",
+            "size": 12398,
+            "type": "image\/jpeg",
+            "width": 250,
+            "height": 125,
+            "thumb_name": "\/var\/www\/html\/screenshot.unixpin.com\/image2video\/uploads\/150618673841be33720c67f96493b0757f34357fa759b6ce3e\/thumb_31ccdccb9db8cbdf8564ae85065e947480fcab52.jpg",
+            "thumb_url": ".\/uploads\/150618673841be33720c67f96493b0757f34357fa759b6ce3e\/thumb_31ccdccb9db8cbdf8564ae85065e947480fcab52.jpg",
+            "thumb_w": 200,
+            "thumb_h": 100
+        }
+    }
+}
+</pre>
+
+
+
+</body>
+</html>
